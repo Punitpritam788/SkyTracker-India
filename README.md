@@ -1,2 +1,13 @@
-# SkyTracker-India
-SkyTracker India is a smart flight pricing tool that tracks airfare across starting day of ticket issued to it's end which has 330 days of lifecycle. It visualizes price trends, forecasts future fares, and offers insights like best booking time, cheapest dates, and demand levels helping travelers make informed, cost effective flight decisions.
+# SkyTracker India
+
+## Features
+- Track your sky effortlessly.
+- User-friendly interface for star gazing.
+- Real-time data updates.
+- Detailed information on celestial events.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Copyright
+© 2026 Punitpritam788. All rights reserved.
