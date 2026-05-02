@@ -1,0 +1,1438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkyTracker India — Flight Lifecycle Tracking</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    color-scheme: dark;
+    --bg0: #08100d; --bg1: #0d1a14; --bg2: #13221a; --bg3: #1a2e22;
+    --border: rgba(80,180,120,0.15); --border2: rgba(80,180,120,0.28);
+    --saffron: #ff8c00; --green-ind: #138808; --navy: #000080;
+    --blue: #4db8a0; --green: #3ecf8e; --green-dim: rgba(62,207,142,0.10);
+    --red: #f05060; --red-dim: rgba(240,80,96,0.10); --saffron-dim: rgba(255,140,0,0.12);
+    --text: #ddf0e8; --text2: #7aab92; --text3: #4a7a60;
+    --overlay-bg: rgba(13,26,20,0.85);
+    --mono: 'Fira Code', monospace; --sans: 'Outfit', sans-serif;
+    --radius-sm: 8px; --radius-md: 14px; --radius-lg: 24px; --radius-full: 9999px;
+    --shadow-card: rgba(0,0,0,0.25) 0 0 0 1px, rgba(0,0,0,0.18) 0 2px 6px, rgba(0,0,0,0.32) 0 6px 16px;
+    --shadow-hover: rgba(0,0,0,0.35) 0 0 0 1px, rgba(0,0,0,0.22) 0 4px 12px, rgba(0,0,0,0.4) 0 8px 24px;
+    --shadow-pill: rgba(0,0,0,0.3) 0 1px 2px, rgba(80,180,120,0.12) 0 0 0 1px;
+    --sp-xs:4px; --sp-sm:8px; --sp-md:12px; --sp-base:16px; --sp-lg:24px; --sp-xl:32px; --sp-xxl:48px;
+  }
+
+  body.light-theme {
+    color-scheme: light;
+    --bg0: #f4f7f5; --bg1: #ffffff; --bg2: #f0f4f2; --bg3: #e2ebe6;
+    --border: rgba(40,140,80,0.15); --border2: rgba(40,140,80,0.28);
+    --text: #0b1a13; --text2: #3a6b52; --text3: #5a8a70;
+    --overlay-bg: rgba(240,244,242,0.85);
+    --shadow-card: rgba(0,0,0,0.05) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.08) 0 6px 16px;
+    --shadow-hover: rgba(0,0,0,0.08) 0 0 0 1px, rgba(0,0,0,0.06) 0 4px 12px, rgba(0,0,0,0.12) 0 8px 24px;
+    --shadow-pill: rgba(0,0,0,0.05) 0 1px 2px, rgba(40,140,80,0.12) 0 0 0 1px;
+  }
+
+  body { font-family: var(--sans); background: var(--bg0); color: var(--text); min-height: 100vh; line-height: 1.5; padding-bottom: 4rem; transition: background 0.4s, color 0.4s; }
+
+  /* SCROLLBAR STYLING */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: var(--radius-full); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+  * { scrollbar-width: thin; scrollbar-color: var(--bg3) transparent; }
+
+  /* HEADER */
+  .header { position:sticky; top:0; z-index:100; background:var(--bg1); border-bottom:1px solid var(--border); height:80px; display:flex; align-items:center; justify-content:space-between; padding:0 var(--sp-xl); transition: background 0.4s, border-color 0.4s; }
+  .logo { display:flex; align-items:center; gap:12px; font-size:1.25rem; font-weight:700; letter-spacing:-0.03em; }
+  .custom-logo { height: 32px; width: auto; object-fit: contain; border-radius: 4px; }
+  .logo-accent{color:var(--saffron);}
+  .header-right { display:flex; align-items:center; gap:12px; }
+  .header-time-pill { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:6px 16px; font-size:0.75rem; font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
+  .theme-btn, .share-btn { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:7px 18px; font-size:0.78rem; font-family:var(--sans); font-weight:500; color:var(--text2); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
+  .theme-btn { padding: 7px; width: 34px; height: 34px; justify-content: center; }
+  .theme-btn:hover, .share-btn:hover { border-color:var(--border2); color:var(--text); }
+
+  .container { max-width:1280px; margin:0 auto; padding:var(--sp-xl); }
+
+  /* HERO */
+  .hero-band { padding:var(--sp-xxl) 0 var(--sp-xl); display:flex; align-items:flex-end; justify-content:space-between; }
+  .hero-title { font-size:2rem; font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
+  .hero-title span { color:var(--saffron); }
+  .hero-sub { font-size:0.85rem; color:var(--text3); font-family:var(--mono); margin-top:6px; }
+  .hero-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:0.72rem; font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
+  .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; box-shadow:0 0 6px var(--green); }
+
+  /* SEARCH PILL */
+  .search-pill-wrap { background:var(--bg1); border-radius:var(--radius-full); border:1px solid var(--border2); box-shadow:var(--shadow-pill); display:flex; align-items:stretch; height:68px; margin-bottom:var(--sp-xxl); position:relative; z-index:20; transition:all 0.4s; }
+  .search-pill-wrap:focus-within { box-shadow:var(--shadow-hover); border-color:rgba(80,180,120,0.45); }
+  .search-segment { flex:1; display:flex; flex-direction:column; justify-content:center; padding:0 var(--sp-lg); position:relative; cursor:text; border-radius:var(--radius-full); transition:background 0.15s; }
+  .search-segment:hover, .search-segment:focus-within { background:var(--bg2); }
+  .search-segment+.search-segment::before { content:''; position:absolute; left:0; top:16px; bottom:16px; width:1px; background:var(--border2); }
+  .search-segment:focus-within+.search-segment::before,.search-segment:focus-within::before,.search-segment:hover+.search-segment::before,.search-segment:hover::before { opacity:0; }
+  .seg-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:2px; }
+  .seg-input { background:transparent; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:0.95rem; font-weight:500; width:100%; text-transform:uppercase; }
+  .seg-input[type="date"] { text-transform:none; }
+  .seg-input::placeholder { color:var(--text3); font-weight:400; text-transform:none; }
+  .seg-input::-webkit-calendar-picker-indicator { filter:invert(0.6) sepia(1) hue-rotate(100deg); }
+  .light-theme .seg-input::-webkit-calendar-picker-indicator { filter: none; opacity: 0.6; }
+  .search-orb-wrap { display:flex; align-items:center; padding:10px 10px 10px 6px; flex-shrink:0; }
+  .search-orb { width:48px; height:48px; border-radius:50%; background:var(--saffron); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 2px 8px rgba(255,140,0,0.35); }
+  .search-orb:hover { transform:scale(1.07); box-shadow:0 4px 16px rgba(255,140,0,0.5); }
+  .search-orb:active { transform:scale(0.95); }
+  .search-orb svg { width:20px; height:20px; }
+
+  /* FEATURE 1 — SAVINGS BANNER */
+  .savings-banner { display:none; background:linear-gradient(135deg,rgba(62,207,142,0.08) 0%,rgba(255,140,0,0.06) 100%); border:1px solid rgba(62,207,142,0.22); border-radius:var(--radius-md); padding:var(--sp-base) var(--sp-xl); margin-bottom:var(--sp-xl); align-items:center; justify-content:space-between; gap:var(--sp-base); animation:slideDown 0.4s ease; }
+  .savings-banner.visible { display:flex; }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+  .savings-left { display:flex; align-items:center; gap:16px; }
+  .savings-icon { font-size:1.8rem; }
+  .savings-headline { font-size:1.05rem; font-weight:700; }
+  .savings-sub { font-size:0.78rem; color:var(--text2); font-family:var(--mono); margin-top:2px; }
+  .savings-right { text-align:right; }
+  .savings-ticker { font-size:2rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; }
+  .savings-ticker-label { font-size:0.62rem; font-family:var(--mono); color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
+
+  /* LIFECYCLE */
+  .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl) var(--sp-xl) var(--sp-lg); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .lifecycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--sp-md); }
+  .lc-card-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
+  .lc-pct-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:3px 12px; font-size:0.72rem; font-family:var(--mono); color:var(--green); }
+  
+  .lc-track-wrap { position:relative; padding:16px 0; margin-top:8px; }
+  .lc-rail { position:absolute; top:50%; left:16px; right:16px; height:4px; transform:translateY(-50%); background:var(--bg3); border-radius:var(--radius-full); z-index:0; margin:0; }
+  .lc-rail-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--blue)); border-radius:var(--radius-full); transition:width 1s cubic-bezier(0.4,0,0.2,1); width:0%; }
+  .lc-steps { display:flex; justify-content:space-between; position:relative; z-index:1; }
+  .lc-step { display:flex; flex-direction:row; align-items:center; gap:8px; background:var(--bg1); padding:4px 12px 4px 4px; border-radius:var(--radius-full); transition:background 0.4s; }
+  .lc-step:first-child { padding-left:0; }
+  .lc-step:last-child { padding-right:0; padding-left:12px; }
+  .lc-step-text { display:flex; align-items:center; gap:6px; }
+  .lc-dot-outer { width:32px; height:32px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg2); border:2px solid var(--border2); transition:all 0.3s; }
+  .lc-dot-inner { width:10px; height:10px; border-radius:50%; background:var(--text3); transition:all 0.3s; }
+  .lc-step.active .lc-dot-outer { background:rgba(62,207,142,0.12); border-color:var(--green); box-shadow:0 0 0 4px rgba(62,207,142,0.08); }
+  .lc-step.active .lc-dot-inner { background:var(--green); }
+  .lc-step.future .lc-dot-outer { border-style:dashed; border-color:var(--saffron); }
+  .lc-step.future .lc-dot-inner { background:var(--saffron); opacity:0.5; }
+  .lc-step-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); }
+  .lc-step-date { font-size:0.75rem; font-weight:600; color:var(--text); white-space:nowrap; }
+
+  /* METRICS */
+  .metrics-row { display:grid; grid-template-columns:repeat(5,1fr); gap:var(--sp-md); margin-bottom:var(--sp-xl); }
+  .metric-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-lg); cursor:default; transition:box-shadow 0.2s,transform 0.2s, background 0.4s, border-color 0.4s; position:relative; overflow:hidden; }
+  .metric-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
+  .metric-card::after { content:''; position:absolute; top:0; left:var(--sp-lg); right:var(--sp-lg); height:2px; border-radius:0 0 2px 2px; }
+  .metric-card.saffron::after{background:var(--saffron);} .metric-card.green::after{background:var(--green);} .metric-card.red::after{background:var(--red);} .metric-card.blue::after{background:var(--blue);} .metric-card.neutral::after{background:var(--text3);}
+  .metric-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:var(--sp-sm); }
+  .metric-value { font-size:1.45rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.03em; line-height:1; margin-bottom:var(--sp-xs); }
+  .metric-value.up{color:var(--red);} .metric-value.down{color:var(--green);} .metric-value.neutral{color:var(--text);}
+  .metric-sub { font-size:0.7rem; color:var(--text3); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* CONTENT GRID */
+  .content-grid { display:grid; grid-template-columns:1fr 360px; gap:var(--sp-xl); }
+  .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--sp-lg); }
+  .panel-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); }
+  .chart-tabs { display:flex; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-full); padding:3px; }
+  .chart-tab { padding:5px 14px; border-radius:var(--radius-full); font-size:0.7rem; font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; }
+  .chart-tab.active { background:var(--bg3); color:var(--saffron); }
+  .chart-tab:hover:not(.active) { color:var(--text2); }
+  .chart-wrap { position:relative; flex-grow:1; min-height:320px; }
+  .empty-overlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--overlay-bg); backdrop-filter:blur(4px); z-index:10; border-radius:var(--radius-sm); color:var(--text2); font-family:var(--mono); font-size:0.88rem; text-align:center; padding:var(--sp-xl); line-height:1.7; transition: background 0.4s; }
+  .empty-icon { font-size:2rem; margin-bottom:var(--sp-base); opacity:0.4; }
+  .chart-legend { display:flex; gap:var(--sp-xl); margin-top:var(--sp-base); font-size:0.72rem; font-family:var(--mono); color:var(--text3); justify-content:center; }
+  .legend-item { display:flex; align-items:center; gap:8px; }
+  .legend-line { width:20px; height:2px; border-radius:2px; }
+  .recommendation-box { border-radius:var(--radius-md); padding:var(--sp-lg); margin-bottom:var(--sp-base); border:1px solid; transition:all 0.3s; }
+  .rec-buy{background:var(--green-dim);border-color:rgba(62,207,142,0.3);} .rec-wait{background:var(--saffron-dim);border-color:rgba(255,140,0,0.3);} .rec-caution{background:var(--red-dim);border-color:rgba(240,80,96,0.3);}
+  .rec-action { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .rec-buy .rec-action{color:var(--green);} .rec-wait .rec-action{color:var(--saffron);} .rec-caution .rec-action{color:var(--red);}
+  .rec-detail { font-size:0.82rem; color:var(--text2); line-height:1.65; }
+  .stat-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; }
+  .stat-row-value { font-weight:600; font-family:var(--mono); font-size:0.88rem; color:var(--text); }
+  .route-badge { display:inline-flex; align-items:center; padding:2px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.68rem; color:var(--saffron); margin-left:8px; }
+
+  /* FEATURE 2 — PRICE ALERT */
+  .alert-section { margin-top:var(--sp-base); padding-top:var(--sp-base); border-top:1px solid var(--border); }
+  .alert-label { font-size:0.68rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
+  .alert-input-row { display:flex; gap:8px; }
+  .alert-input { flex:1; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:0.9rem; padding:9px 12px; outline:none; transition:all 0.4s; text-transform:uppercase; }
+  .alert-input:focus { border-color:var(--saffron); }
+  .alert-btn { background:var(--saffron); color:#000; border:none; border-radius:var(--radius-sm); padding:9px 16px; font-size:0.82rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; white-space:nowrap; }
+  .alert-btn:hover { opacity:0.85; }
+  .alert-result { margin-top:10px; font-size:0.8rem; font-family:var(--mono); line-height:1.6; padding:10px 12px; background:var(--bg2); border-radius:var(--radius-sm); color:var(--text2); display:none; transition: all 0.4s; }
+  .alert-result.visible{display:block;} .alert-result.hit{color:var(--green);} .alert-result.miss{color:var(--saffron);} .alert-result.future{color:var(--blue);}
+  
+  .alert-controls { display:flex; justify-content:space-between; align-items:center; margin-top:10px; margin-bottom:6px; font-size:0.75rem; }
+  .alert-sort { background:var(--bg1); border:1px solid var(--border); color:var(--text); font-family:var(--mono); font-size:0.7rem; padding:4px 8px; border-radius:4px; outline:none; cursor:pointer; }
+  .alert-match-btn { display:inline-block; margin:3px 4px 3px 0; padding:4px 8px; background:var(--bg1); border:1px solid var(--border); border-radius:4px; font-size:0.75rem; color:var(--text); cursor:pointer; transition:all 0.15s; }
+  .alert-match-btn:hover { border-color:var(--saffron); transform:translateY(-1px); box-shadow:var(--shadow-pill); }
+  .alert-match-btn strong { color:var(--green); margin-left:4px; }
+
+  /* FEATURES ROW */
+  .features-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-xl); margin-top:var(--sp-xl); }
+  .split-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-xl); margin-top:var(--sp-xl); }
+
+  /* FEATURE 3 — BOOKING SCORE GAUGE */
+  .score-wrap { display:flex; flex-direction:column; align-items:center; padding:var(--sp-base) 0; flex-grow:1; }
+  .gauge-svg-wrap { position:relative; width:180px; height:110px; margin:0 auto; }
+  .gauge-score-text { position:absolute; bottom:0; left:50%; transform:translateX(-50%); text-align:center; white-space:nowrap; }
+  .gauge-score-num { font-size:2.4rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; line-height:1; }
+  .gauge-score-label { font-size:0.62rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
+  .score-grade { font-size:0.9rem; font-weight:700; margin-top:12px; padding:4px 20px; border-radius:var(--radius-full); font-family:var(--mono); border:1px solid; transition: all 0.4s; }
+  .score-grade.A{background:rgba(62,207,142,0.15);color:var(--green);border-color:rgba(62,207,142,0.3);}
+  .score-grade.B{background:rgba(77,184,160,0.15);color:var(--blue);border-color:rgba(77,184,160,0.3);}
+  .score-grade.C{background:var(--saffron-dim);color:var(--saffron);border-color:rgba(255,140,0,0.3);}
+  .score-grade.D{background:var(--red-dim);color:var(--red);border-color:rgba(240,80,96,0.3);}
+  .score-grade.none{background:var(--bg2);color:var(--text3);border-color:var(--border);}
+  .score-desc { font-size:0.75rem; color:var(--text2); text-align:center; margin-top:10px; line-height:1.6; flex-grow:1; }
+
+  /* FEATURE 4 — FLEX DATE FINDER */
+  .flex-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:var(--sp-sm); }
+  .flex-cell { border-radius:var(--radius-sm); padding:8px 2px; text-align:center; cursor:pointer; transition:all 0.15s; border:1px solid var(--border); background:var(--bg2); }
+  .flex-cell:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-hover); }
+  .flex-cell.cheapest { background:rgba(62,207,142,0.1); border-color:rgba(62,207,142,0.4); }
+  .flex-cell.selected { background:var(--bg3); border-color:var(--saffron); }
+  .flex-cell.past { opacity:0.3; cursor:default; pointer-events:none; }
+  .flex-day { font-size:0.58rem; font-family:var(--mono); text-transform:uppercase; color:var(--text3); letter-spacing:0.04em; }
+  .flex-date { font-size:0.7rem; font-weight:600; color:var(--text); margin:3px 0; }
+  .flex-price { font-size:0.62rem; font-family:var(--mono); color:var(--text2); }
+  .flex-cell.cheapest .flex-price { color:var(--green); font-weight:600; }
+  .flex-cell.selected .flex-price { color:var(--saffron); }
+  .flex-badge { font-size:0.52rem; background:var(--green); color:#000; border-radius:var(--radius-full); padding:1px 5px; margin-top:3px; display:none; font-weight:700; }
+  .flex-cell.cheapest .flex-badge { display:inline-block; }
+
+  /* FEATURE 5 — BEST DAY TO FLY */
+  .dow-chart { display:flex; align-items:flex-end; gap:6px; height:100px; margin-top:var(--sp-sm); }
+  .dow-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
+  .dow-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; transition:height 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--bg3); }
+  .dow-bar.cheapest-day { background:var(--green); box-shadow:0 0 8px rgba(62,207,142,0.3); }
+  .dow-bar.pricey-day { background:var(--red); }
+  .dow-bar.mid-day { background:var(--blue); opacity:0.7; }
+  .dow-label { font-size:0.6rem; font-family:var(--mono); color:var(--text3); text-transform:uppercase; }
+  .dow-price-label { font-size:0.58rem; font-family:var(--mono); color:var(--text3); }
+  .dow-bar-wrap.best .dow-price-label { color:var(--green); font-weight:600; }
+  .dow-best-label { font-size:0.72rem; font-family:var(--mono); color:var(--text2); margin-top:12px; text-align:center; line-height:1.6; }
+  .dow-best-label span { color:var(--green); font-weight:600; }
+
+  /* FEATURE 6 — DEMAND ROW */
+  .demand-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:var(--sp-xl); margin-top:var(--sp-xl); }
+  .demand-panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s;}
+  .demand-inner { display:flex; align-items:center; gap:var(--sp-lg); }
+  .demand-ring-wrap { position:relative; flex-shrink:0; }
+  .demand-ring-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+  .demand-level { font-size:0.85rem; font-weight:700; font-family:var(--mono); line-height:1; }
+  .demand-pct-sub { font-size:0.6rem; color:var(--text3); font-family:var(--mono); }
+  .demand-info { flex:1; min-width:0; }
+  .demand-title-lbl { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:6px; }
+  .demand-headline { font-size:0.95rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .demand-sub { font-size:0.76rem; color:var(--text2); line-height:1.5; }
+  .social-proof { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); display:flex; align-items:center; gap:var(--sp-lg); transition:all 0.4s; }
+  .social-avatars { display:flex; flex-shrink:0; }
+  .social-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:2px solid var(--bg1); margin-left:-10px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:all 0.4s; }
+  .social-avatar:first-child{margin-left:0;}
+  .social-count { font-size:1.25rem; font-weight:700; font-family:var(--mono); color:var(--saffron); }
+  .social-desc { font-size:0.78rem; color:var(--text2); line-height:1.5; margin-top:4px; }
+  .price-confidence { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s;}
+  .confidence-bars { margin-top:var(--sp-sm); display:flex; flex-direction:column; gap:12px; }
+  .conf-row { display:flex; align-items:center; gap:10px; }
+  .conf-label { font-size:0.66rem; font-family:var(--mono); color:var(--text2); width:100px; flex-shrink:0; }
+  .conf-track { flex:1; height:6px; background:var(--bg3); border-radius:var(--radius-full); overflow:hidden; }
+  .conf-fill { height:100%; border-radius:var(--radius-full); width:0%; transition:width 1s ease; }
+  .conf-val { font-size:0.66rem; font-family:var(--mono); color:var(--text3); width:32px; text-align:right; flex-shrink:0; }
+
+  /* NEW EXTENDED FEATURES */
+  .heatmap-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-top:var(--sp-sm); }
+  .heatmap-cell { border-radius:4px; padding:8px 2px; text-align:center; font-family:var(--mono); font-size:0.65rem; font-weight:600; color:var(--text); border:1px solid rgba(255,255,255,0.05); transition:all 0.15s; }
+  .heatmap-cell[onclick]:hover { transform:translateY(-2px); }
+  .light-theme .heatmap-cell { border-color: rgba(0,0,0,0.05); }
+  .hm-low { background: rgba(62,207,142,0.15); color:var(--green); border-color: rgba(62,207,142,0.3); }
+  .hm-low[onclick]:hover { border-color: var(--green); box-shadow: 0 4px 12px rgba(62,207,142,0.25); }
+  .hm-mid { background: rgba(255,140,0,0.15); color:var(--saffron); border-color: rgba(255,140,0,0.3); }
+  .hm-mid[onclick]:hover { border-color: var(--saffron); box-shadow: 0 4px 12px rgba(255,140,0,0.25); }
+  .hm-high { background: rgba(240,80,96,0.15); color:var(--red); border-color: rgba(240,80,96,0.3); }
+  .hm-high[onclick]:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(240,80,96,0.25); }
+  .hm-day { font-size:0.5rem; opacity:0.7; margin-bottom:4px; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; font-weight:400; }
+  
+  .season-bar-wrap { width:100%; height:8px; background:var(--bg3); border-radius:4px; margin-top:6px; overflow:hidden; }
+  .season-bar-fill { height:100%; border-radius:4px; transition:width 1s ease; }
+  .season-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2px; }
+  .compare-bar { display:flex; align-items:center; height:24px; border-radius:4px; margin-top:6px; color:#000; font-family:var(--mono); font-size:0.7rem; font-weight:700; padding:0 8px; transition:width 1s ease; }
+
+  /* TOAST */
+  #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:0.88rem; font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
+  #toast.show{transform:translateY(0);opacity:1;}
+  #toast.ok{background:var(--green);color:#000;box-shadow:0 4px 16px rgba(62,207,142,0.35);}
+
+  /* RESPONSIVE */
+  @media(max-width:1024px){
+    .content-grid,.features-row,.demand-row,.split-row{grid-template-columns:1fr;}
+    .metrics-row{grid-template-columns:repeat(3,1fr);}
+    .search-pill-wrap{height:auto;flex-wrap:wrap;border-radius:var(--radius-lg);}
+    .search-segment{min-height:56px;border-radius:var(--radius-sm);}
+    .search-segment+.search-segment::before{display:none;}
+    .search-orb-wrap{padding:10px 12px;margin-left:auto;}
+    .hero-band{flex-direction:column;align-items:flex-start;gap:var(--sp-base);}
+    .hero-badges{justify-content:flex-start;}
+    .savings-banner{flex-direction:column;align-items:flex-start;}
+  }
+  @media(max-width:640px){
+    .container{padding:var(--sp-base);}
+    .metrics-row{grid-template-columns:1fr 1fr;}
+    .header{padding:0 var(--sp-base);}
+    .hero-title{font-size:1.5rem;}
+    .lc-step-date{font-size:0.7rem;}
+    .share-btn span{display:none;}
+    .lc-step-label { display: none; }
+    .lc-step { padding: 2px 8px 2px 2px; gap: 6px; }
+    .lc-step:last-child { padding: 2px 2px 2px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <img src="https://i.postimg.cc/dtr4qJf8/download.png" alt="SkyTracker Logo" class="custom-logo">
+    Sky<span class="logo-accent">Tracker</span>&nbsp;India
+  </div>
+  <div class="header-right">
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+      <span id="theme-icon">🌙</span>
+    </button>
+    <button class="share-btn" onclick="shareDeal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      <span>Share Deal</span>
+    </button>
+    <div class="header-time-pill" id="current-time"></div>
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="hero-band">
+    <div>
+      <h1 class="hero-title">Track the <span>complete lifecycle</span><br>of any Indian flight.</h1>
+      <p class="hero-sub">330-day window · Tier-based dynamic pricing · 70+ airports</p>
+    </div>
+    <div class="hero-badges">
+      <span class="hero-badge"><span class="dot"></span>70+ Airports Active</span>
+      <span class="hero-badge"><span class="dot"></span>Metros · Capitals · Regional Hubs</span>
+    </div>
+  </div>
+
+  <div class="search-pill-wrap">
+    <div class="search-segment">
+      <div class="seg-label">Origin</div>
+      <input class="seg-input" id="inp-origin" list="airport-list" placeholder="e.g., DEL" maxlength="3" autocomplete="off">
+    </div>
+    <div class="search-segment">
+      <div class="seg-label">Destination</div>
+      <input class="seg-input" id="inp-dest" list="airport-list" placeholder="e.g., BOM" maxlength="3" autocomplete="off">
+    </div>
+    <div class="search-segment">
+      <div class="seg-label">Departure Date</div>
+      <input class="seg-input" type="date" id="inp-date">
+    </div>
+    <div class="search-orb-wrap">
+      <button class="search-orb" onclick="trackFlight()" title="Track Lifecycle">
+        <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" stroke="var(--bg0)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>
+      </button>
+    </div>
+    <datalist id="airport-list"></datalist>
+  </div>
+
+  <!-- FEATURE 1: Savings vs Departure Banner -->
+  <div class="savings-banner" id="savings-banner">
+    <div class="savings-left">
+      <div class="savings-icon">💰</div>
+      <div>
+        <div class="savings-headline" id="savings-headline"></div>
+        <div class="savings-sub" id="savings-sub"></div>
+      </div>
+    </div>
+    <div class="savings-right">
+      <div class="savings-ticker" id="savings-ticker">₹—</div>
+      <div class="savings-ticker-label">Potential Savings Today</div>
+    </div>
+  </div>
+
+  <div class="lifecycle-card" id="lifecycle-bar" style="opacity:0.4;">
+    <div class="lifecycle-header">
+      <span class="lc-card-title">Booking Lifecycle Progress</span>
+      <span class="lc-pct-badge" id="lc-pct-badge">Not started</span>
+    </div>
+    <div class="lc-track-wrap">
+      <div class="lc-rail"><div class="lc-rail-fill" id="lc-progress" style="width:0%"></div></div>
+      <div class="lc-steps">
+        <div class="lc-step" id="step-listed">
+          <div class="lc-dot-outer"><div class="lc-dot-inner"></div></div>
+          <div class="lc-step-text"><span class="lc-step-label">Listed:</span> <span class="lc-step-date" id="date-listed">—</span></div>
+        </div>
+        <div class="lc-step" id="step-today">
+          <div class="lc-dot-outer"><div class="lc-dot-inner"></div></div>
+          <div class="lc-step-text"><span class="lc-step-label">Today:</span> <span class="lc-step-date" id="date-today">—</span></div>
+        </div>
+        <div class="lc-step" id="step-depart">
+          <div class="lc-step-text"><span class="lc-step-label">Departure:</span> <span class="lc-step-date" id="date-depart">—</span></div>
+          <div class="lc-dot-outer"><div class="lc-dot-inner"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <div class="metric-card neutral">
+      <div class="metric-label">Initial Listing Fare</div>
+      <div class="metric-value" id="m-initial">—</div>
+      <div class="metric-sub" id="m-initial-sub">At T-330 days</div>
+    </div>
+    <div class="metric-card saffron">
+      <div class="metric-label">Current Fare</div>
+      <div class="metric-value" id="m-current">—</div>
+      <div class="metric-sub" id="m-current-sub">Awaiting Search</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-label">Lowest Tracked</div>
+      <div class="metric-value down" id="m-low">—</div>
+      <div class="metric-sub" id="m-low-sub">Since listing</div>
+      <div class="metric-sub" id="m-low-date" style="margin-top:3px;color:var(--green);opacity:0.85;"></div>
+    </div>
+    <div class="metric-card red">
+      <div class="metric-label">Forecast at Departure</div>
+      <div class="metric-value up" id="m-pred">—</div>
+      <div class="metric-sub" id="m-pred-sub">Expected final price</div>
+    </div>
+    <div class="metric-card blue">
+      <div class="metric-label">Timeline Status</div>
+      <div class="metric-value neutral" id="m-status">—</div>
+      <div class="metric-sub" id="m-status-sub">Days remaining</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title" id="chart-title">Price Lifecycle Curve</div>
+        <div class="chart-tabs">
+          <button class="chart-tab active" onclick="setZoom('all',this)">330D</button>
+          <button class="chart-tab" onclick="setZoom('past90',this)">Past 90D</button>
+          <button class="chart-tab" onclick="setZoom('past30',this)">Past 30D</button>
+          <button class="chart-tab" onclick="setZoom('past7',this)">Past 7D</button>
+          <button class="chart-tab" onclick="setZoom('future',this)">Forecast</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <div id="empty-chart-msg" class="empty-overlay">
+          <div class="empty-icon">✈</div>
+          Enter any valid Indian domestic route above to simulate the full 330-day booking lifecycle.<br>
+          <span style="font-size:0.72rem;color:var(--text3);margin-top:8px;display:block;">Supports 70+ airports from metros to regional hubs.</span>
+        </div>
+        <canvas id="priceChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-line" style="background:var(--green);"></div><span>Tracked History</span></div>
+        <div class="legend-item"><div class="legend-line" style="background:var(--saffron);"></div><span>Prediction</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Lifecycle Analysis</div></div>
+      <div style="flex-grow:1;display:flex;flex-direction:column;">
+        <div class="recommendation-box rec-wait" id="rec-box" style="opacity:0.5;">
+          <div class="rec-action" id="rec-action">Awaiting Route Input</div>
+          <div class="rec-detail" id="rec-detail">Enter a route to see analysis based on where we are in the 330-day booking window.</div>
+        </div>
+        <div class="stat-row"><span class="stat-row-label">Base Fare</span><span class="stat-row-value" id="stat-base">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">Days Tracked</span><span class="stat-row-value" id="stat-tracked">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">vs. Initial</span><span class="stat-row-value" id="stat-vs-init">—</span></div>
+        <div class="stat-row"><span class="stat-row-label">7-Day Trend</span><span class="stat-row-value" id="stat-trend">—</span></div>
+
+        <!-- FEATURE 2: Price Alert -->
+        <div class="alert-section">
+          <div class="alert-label">🔔 Price Alert — Set Target Fare</div>
+          <div class="alert-input-row">
+            <input class="alert-input" id="alert-price-input" type="number" placeholder="₹ Your target price" min="500" max="30000" style="text-transform:none;">
+            <button class="alert-btn" onclick="checkPriceAlert()">Check</button>
+          </div>
+          <div class="alert-result" id="alert-result"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES ROW -->
+  <div class="features-row">
+
+    <!-- FEATURE 3: Smart Booking Score -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Smart Booking Score</div></div>
+      <div class="score-wrap" id="score-wrap">
+        <div class="gauge-svg-wrap">
+          <svg width="180" height="110" viewBox="0 0 180 110" style="overflow:visible;">
+            <defs>
+              <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#f05060"/>
+                <stop offset="35%" stop-color="#ff8c00"/>
+                <stop offset="70%" stop-color="#4db8a0"/>
+                <stop offset="100%" stop-color="#3ecf8e"/>
+              </linearGradient>
+            </defs>
+            <path d="M 18 95 A 72 72 0 0 1 162 95" fill="none" stroke="var(--bg3)" stroke-width="13" stroke-linecap="round"/>
+            <path id="gauge-arc" d="M 18 95 A 72 72 0 0 1 162 95" fill="none" stroke="url(#gaugeGrad)" stroke-width="13" stroke-linecap="round" stroke-dasharray="226" stroke-dashoffset="226" style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1);"/>
+          </svg>
+          <div class="gauge-score-text">
+            <div class="gauge-score-num" id="gauge-num" style="color:var(--text3);">—</div>
+            <div class="gauge-score-label">/ 100</div>
+          </div>
+        </div>
+        <div class="score-grade none" id="score-grade">Not Rated</div>
+        <div class="score-desc" id="score-desc">Track a route to receive a 0–100 deal score based on current fare position, timing, and forecast trajectory.</div>
+      </div>
+    </div>
+
+    <!-- FEATURE 4: Flex Date Finder -->
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Flex Date Finder</div>
+        <div style="font-size:0.65rem;font-family:var(--mono);color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-full);padding:3px 10px;">±3 days</div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:12px;line-height:1.5;">Tap a date to re-track. <span style="color:var(--green);font-weight:600;">BEST</span> badge marks the cheapest day in this window.</div>
+      <div class="flex-grid" id="flex-grid">
+        <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to see ±3 day flex prices</div>
+      </div>
+    </div>
+
+    <!-- FEATURE 5: Best Day to Fly -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Best Day to Fly</div></div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:12px;line-height:1.5;">Average fare by departure weekday for this route near your date.</div>
+      <div class="dow-chart" id="dow-chart">
+        <div style="align-self:center;font-size:0.78rem;font-family:var(--mono);color:var(--text3);text-align:center;width:100%;">Track a route to see day analysis</div>
+      </div>
+      <div class="dow-best-label" id="dow-best-label" style="display:none;"></div>
+    </div>
+
+  </div>
+
+  <!-- DEMAND ROW -->
+  <div class="demand-row">
+
+    <!-- FEATURE 6a: Route Demand -->
+    <div class="demand-panel">
+      <div class="panel-header" style="margin-bottom:var(--sp-base);"><div class="panel-title">Route Demand Indicator</div></div>
+      <div class="demand-inner">
+        <div class="demand-ring-wrap">
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle cx="44" cy="44" r="34" fill="none" stroke="var(--bg3)" stroke-width="10"/>
+            <circle id="demand-ring" cx="44" cy="44" r="34" fill="none" stroke="var(--saffron)" stroke-width="10" stroke-linecap="round" stroke-dasharray="214" stroke-dashoffset="214" transform="rotate(-90 44 44)" style="transition:stroke-dashoffset 1s ease;"/>
+          </svg>
+          <div class="demand-ring-text">
+            <div class="demand-level" id="demand-level" style="color:var(--text3);">—</div>
+            <div class="demand-pct-sub" id="demand-pct">—</div>
+          </div>
+        </div>
+        <div class="demand-info">
+          <div class="demand-title-lbl">Demand Level</div>
+          <div class="demand-headline" id="demand-headline">Track a route</div>
+          <div class="demand-sub" id="demand-sub">Demand drives how quickly fares escalate near departure.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FEATURE 6b: Social Proof -->
+    <div class="social-proof">
+      <div>
+        <div style="font-size:0.65rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:10px;">Travelers Watching</div>
+        <div class="social-avatars" id="social-avatars"><div class="social-avatar">👤</div></div>
+      </div>
+      <div>
+        <div class="social-count" id="social-count">—</div>
+        <div class="social-desc" id="social-desc">people are currently tracking this route.</div>
+        <div style="font-size:0.72rem;color:var(--saffron);margin-top:4px;font-family:var(--mono);" id="social-urgency"></div>
+      </div>
+    </div>
+
+    <!-- FEATURE 6c: Forecast Confidence -->
+    <div class="price-confidence">
+      <div class="panel-header" style="margin-bottom:var(--sp-base);"><div class="panel-title">Forecast Confidence</div></div>
+      <div class="confidence-bars" id="confidence-bars">
+        <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to see confidence breakdown</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXTENDED FEATURES ROW 1 -->
+  <div class="split-row">
+    
+    <!-- Price Heatmap Calendar -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Price Heatmap Calendar (28 Days)</div></div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:8px;line-height:1.5;">Visual calendar showing cheap vs expensive days around your departure.</div>
+      <div class="heatmap-grid" id="heatmap-grid">
+         <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to view price heatmap</div>
+      </div>
+    </div>
+
+    <!-- Route Comparison -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
+      <div class="alert-input-row" style="margin-bottom:16px;">
+        <input class="alert-input" id="compare-dest" list="airport-list" placeholder="Alt Dest (e.g., GOI)" maxlength="3" autocomplete="off">
+        <button class="alert-btn" onclick="compareRoute()">Compare</button>
+      </div>
+      <div id="compare-result" style="display:none; background:var(--bg2); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border);">
+         <!-- Comparison results injected here -->
+      </div>
+    </div>
+
+  </div>
+
+  <!-- EXTENDED FEATURES ROW 2 -->
+  <div class="split-row">
+    
+    <!-- Fare History Breakdown -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Fare History Breakdown</div></div>
+      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:16px;line-height:1.5;">Average baseline price patterns for this route by season.</div>
+      <div id="season-breakdown" style="display:flex; flex-direction:column; gap:16px; opacity:0.4;">
+         <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view seasonal history</div>
+      </div>
+    </div>
+
+    <!-- Animated Flight Path -->
+    <div class="panel">
+      <div class="panel-header"><div class="panel-title">Live Route Path</div></div>
+      <div style="width:100%; height:320px; display:flex; align-items:center; justify-content:center; position:relative; background:var(--bg2); border-radius:var(--radius-md); border:1px solid var(--border); overflow:hidden;" id="flight-path-container">
+         <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to view flight path</div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+<div id="toast"></div>
+
+<script>
+const INDIAN_AIRPORTS = {
+  'DEL':{name:'New Delhi',tier:1,lat:28.56,lon:77.10},'BOM':{name:'Mumbai',tier:1,lat:19.09,lon:72.87},'BLR':{name:'Bengaluru',tier:1,lat:13.20,lon:77.71},
+  'HYD':{name:'Hyderabad',tier:1,lat:17.24,lon:78.43},'MAA':{name:'Chennai',tier:1,lat:12.99,lon:80.18},'CCU':{name:'Kolkata',tier:1,lat:22.65,lon:88.45},
+  'AMD':{name:'Ahmedabad',tier:2,lat:23.07,lon:72.63},'PNQ':{name:'Pune',tier:2,lat:18.58,lon:73.92},'GOI':{name:'Goa (Dabolim)',tier:2,lat:15.38,lon:73.83},
+  'GOX':{name:'Goa (Mopa)',tier:2,lat:15.73,lon:73.87},'COK':{name:'Kochi',tier:2,lat:10.15,lon:76.40},'TRV':{name:'Thiruvananthapuram',tier:2,lat:8.48,lon:76.92},
+  'CCJ':{name:'Kozhikode',tier:2,lat:11.13,lon:75.95},'JAI':{name:'Jaipur',tier:2,lat:26.82,lon:75.80},'LKO':{name:'Lucknow',tier:2,lat:26.76,lon:80.88},
+  'PAT':{name:'Patna',tier:2,lat:25.59,lon:85.08},'GAU':{name:'Guwahati',tier:2,lat:26.10,lon:91.58},'BBI':{name:'Bhubaneswar',tier:2,lat:20.25,lon:85.81},
+  'NAG':{name:'Nagpur',tier:2,lat:21.06,lon:79.05},'IDR':{name:'Indore',tier:2,lat:22.72,lon:75.80},'VNS':{name:'Varanasi',tier:2,lat:25.45,lon:82.85},
+  'ATQ':{name:'Amritsar',tier:2,lat:31.71,lon:74.80},'IXC':{name:'Chandigarh',tier:2,lat:30.67,lon:76.79},'SXR':{name:'Srinagar',tier:2,lat:33.98,lon:74.77},
+  'IXJ':{name:'Jammu',tier:2,lat:32.69,lon:74.84},'VTZ':{name:'Visakhapatnam',tier:2,lat:17.72,lon:83.22},'IXB':{name:'Bagdogra',tier:2,lat:26.68,lon:88.33},
+  'IXZ':{name:'Port Blair',tier:2,lat:11.64,lon:92.73},'CJB':{name:'Coimbatore',tier:3,lat:11.03,lon:77.04},'IXM':{name:'Madurai',tier:3,lat:9.83,lon:78.09},
+  'TRZ':{name:'Tiruchirappalli',tier:3,lat:10.76,lon:78.71},'IXE':{name:'Mangaluru',tier:3,lat:12.96,lon:74.89},'HBX':{name:'Hubballi',tier:3,lat:15.36,lon:75.08},
+  'MYQ':{name:'Mysuru',tier:3,lat:12.23,lon:76.65},'IXG':{name:'Belagavi',tier:3,lat:15.86,lon:74.62},'VJY':{name:'Vijayawada',tier:3,lat:16.53,lon:80.80},
+  'TIR':{name:'Tirupati',tier:3,lat:13.63,lon:79.54},'RPR':{name:'Raipur',tier:3,lat:21.18,lon:81.73},'IXR':{name:'Ranchi',tier:3,lat:23.31,lon:85.32},
+  'GAY':{name:'Gaya',tier:3,lat:24.74,lon:84.94},'UDR':{name:'Udaipur',tier:3,lat:24.61,lon:73.89},'JDY':{name:'Jodhpur',tier:3,lat:26.26,lon:73.05},
+  'JSA':{name:'Jaisalmer',tier:3,lat:26.89,lon:70.86},'BKN':{name:'Bikaner',tier:3,lat:28.07,lon:73.20},'KNU':{name:'Kanpur',tier:3,lat:26.40,lon:80.40},
+  'IXD':{name:'Prayagraj',tier:3,lat:25.43,lon:81.73},'GKP':{name:'Gorakhpur',tier:3,lat:26.74,lon:83.45},'RDP':{name:'Durgapur',tier:3,lat:23.62,lon:87.24},
+  'IXA':{name:'Agartala',tier:3,lat:23.88,lon:91.24},'IMF':{name:'Imphal',tier:3,lat:24.76,lon:93.89},'SHL':{name:'Shillong',tier:3,lat:25.70,lon:91.97},
+  'AJL':{name:'Aizawl',tier:3,lat:23.79,lon:92.62},'DMU':{name:'Dimapur',tier:3,lat:25.88,lon:93.77},'DIB':{name:'Dibrugarh',tier:3,lat:27.48,lon:95.02},
+  'JRH':{name:'Jorhat',tier:3,lat:26.73,lon:94.17},'IXS':{name:'Silchar',tier:3,lat:24.91,lon:92.97},'BDQ':{name:'Vadodara',tier:3,lat:22.33,lon:73.22},
+  'BHU':{name:'Bhavnagar',tier:3,lat:21.75,lon:72.18},'RAJ':{name:'Rajkot',tier:3,lat:22.30,lon:70.78},'STV':{name:'Surat',tier:3,lat:21.11,lon:72.74},
+  'JGA':{name:'Jamnagar',tier:3,lat:22.46,lon:70.01},'PBD':{name:'Porbandar',tier:3,lat:21.64,lon:69.60},'KND':{name:'Kandla',tier:3,lat:23.11,lon:70.10},
+  'BHJ':{name:'Bhuj',tier:3,lat:23.28,lon:69.67},'DED':{name:'Dehradun',tier:3,lat:30.19,lon:78.18},'IXL':{name:'Leh',tier:3,lat:34.13,lon:77.54},
+  'AGX':{name:'Agatti',tier:3,lat:10.82,lon:72.19},'CNN':{name:'Kannur',tier:3,lat:11.91,lon:75.54}
+};
+
+function populateAirports(){
+  const dl=document.getElementById('airport-list');
+  const c=Object.keys(INDIAN_AIRPORTS).sort((a,b)=>INDIAN_AIRPORTS[a].tier!==INDIAN_AIRPORTS[b].tier?INDIAN_AIRPORTS[a].tier-INDIAN_AIRPORTS[b].tier:a.localeCompare(b));
+  dl.innerHTML=c.map(x=>`<option value="${x}" label="${INDIAN_AIRPORTS[x].name}"></option>`).join('');
+}
+
+function mulberry32(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function fmt(n){return'₹'+n.toLocaleString('en-IN');}
+function gap(d1,d2){return Math.round((d2-d1)/86400000);}
+function fmtDate(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});}
+function fmtShort(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
+function getLocalDateString(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+let priceChart=null,currentData=null,currentZoom='all',toastTimer,flightMap=null,mapLayer=null;
+let isLightMode = false;
+let manualThemeOverride = false;
+let currentAlertMatches = [];
+let currentAlertTarget = 0;
+let currentAlertTodayMatch = false;
+let currentAlertTodayFare = 0;
+
+// THEME LOGIC
+function checkTimeTheme() {
+  if (manualThemeOverride) return;
+  const hour = new Date().getHours();
+  // Light mode between 6 AM and 6 PM
+  const shouldBeLight = hour >= 6 && hour < 18;
+  if (isLightMode !== shouldBeLight) {
+    setTheme(shouldBeLight);
+  }
+}
+
+function toggleTheme() {
+  manualThemeOverride = true;
+  setTheme(!isLightMode);
+}
+
+function setTheme(light) {
+  isLightMode = light;
+  if (light) {
+    document.body.classList.add('light-theme');
+    document.getElementById('theme-icon').textContent = '☀️';
+  } else {
+    document.body.classList.remove('light-theme');
+    document.getElementById('theme-icon').textContent = '🌙';
+  }
+  updateMapTheme();
+  
+  if (priceChart) {
+    priceChart.options.plugins.tooltip.backgroundColor = light ? '#e2ebe6' : '#1a2e22';
+    priceChart.options.plugins.tooltip.titleColor = light ? '#3a6b52' : '#7aab92';
+    priceChart.options.plugins.tooltip.bodyColor = light ? '#0b1a13' : '#ddf0e8';
+    priceChart.options.scales.x.ticks.color = light ? '#5a8a70' : '#4a7a60';
+    priceChart.options.scales.y.ticks.color = light ? '#5a8a70' : '#4a7a60';
+    priceChart.update();
+  }
+}
+
+function updateMapTheme() {
+  if (!flightMap) return;
+  const url = isLightMode 
+      ? 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
+  
+  if (mapLayer) flightMap.removeLayer(mapLayer);
+  mapLayer = L.tileLayer(url, { subdomains: 'abcd', maxZoom: 19 }).addTo(flightMap);
+}
+
+function toast(msg,ok){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(ok?' ok':'');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',3500);
+}
+
+function calcBase(orig,dest,rand){
+  const t1=INDIAN_AIRPORTS[orig]?.tier||3,t2=INDIAN_AIRPORTS[dest]?.tier||3;
+  let mn=3000,mx=5000;
+  if(t1===1&&t2===1){mn=3500;mx=6000;}
+  else if((t1+t2)===3){mn=3800;mx=6500;}
+  else if((t1===1&&t2===3)||(t1===3&&t2===1)){mn=4500;mx=8000;}
+  else if(t1===2&&t2===2){mn=3200;mx=5500;}
+  else{mn=4000;mx=7500;}
+  return Math.floor(mn+rand()*(mx-mn));
+}
+
+function factor(dbd){
+  if(dbd>200)return 1.1+0.1*((dbd-200)/130);
+  if(dbd>100)return 1.0+0.1*((dbd-100)/100);
+  if(dbd>=40)return 1.0-0.22*Math.max(0,1-Math.abs(dbd-70)/30);
+  if(dbd>=14)return 1.0+0.35*((40-dbd)/26);
+  return 1.35+0.8*Math.pow((14-dbd)/14,2);
+}
+
+function priceAt(orig,dest,depDateStr,dbd){
+  let seed=0;const ss=orig+dest+depDateStr;
+  for(let i=0;i<ss.length;i++)seed+=ss.charCodeAt(i)*(i+1);
+  const rand=mulberry32(seed*123);
+  const base=calcBase(orig,dest,rand);
+  const tSum=(INDIAN_AIRPORTS[orig]?.tier||3)+(INDIAN_AIRPORTS[dest]?.tier||3);
+  const vol=0.06+(tSum*0.015)+rand()*0.08;
+  for(let d=330;d>dbd;d--){rand();}
+  const p=Math.round((base*factor(dbd)*(1+(rand()-0.5)*vol))/10)*10;
+  return Math.min(Math.max(p,1500),28000);
+}
+
+function generateLifecycle(orig,dest,depDateStr){
+  const today=new Date();today.setHours(0,0,0,0);
+  const dep=new Date(depDateStr);dep.setHours(0,0,0,0);
+  const dtd=gap(today,dep);
+  if(dtd<0){toast("Flight already departed. Choose a future date.");return null;}
+  if(dtd>330){toast("Flights aren't listed more than 330 days ahead.");return null;}
+
+  const listed=new Date(dep);listed.setDate(listed.getDate()-330);
+  let seed=0;const ss=orig+dest+depDateStr;
+  for(let i=0;i<ss.length;i++)seed+=ss.charCodeAt(i)*(i+1);
+  const rand=mulberry32(seed*123);
+  const base=calcBase(orig,dest,rand);
+  const tSum=(INDIAN_AIRPORTS[orig]?.tier||3)+(INDIAN_AIRPORTS[dest]?.tier||3);
+  const vol=0.06+(tSum*0.015)+rand()*0.08;
+  const doy=Math.floor((dep-new Date(dep.getFullYear(),0,0))/86400000);
+  const wknd=dep.getDay()===0||dep.getDay()===5||dep.getDay()===6;
+  const fest=(doy>280&&doy<310)||(doy>60&&doy<80);
+
+  const hist=[],fore=[],labels=[],dates=[];
+  for(let dbd=330;dbd>=0;dbd--){
+    const noise=1+(rand()-0.5)*vol;
+    let p=Math.round((base*factor(dbd)*noise)/10)*10;
+    if(wknd)p=Math.round(p*1.12);
+    if(fest)p=Math.round(p*1.25);
+    p=Math.min(Math.max(p,1500),28000);
+    const pt=new Date(dep);pt.setDate(pt.getDate()-dbd);
+    dates.push(pt);labels.push(fmtShort(pt));
+    if(dbd>=dtd)hist.push(p);else fore.push(p);
+  }
+  return{orig,dest,base,listed,today,dep,dtd,tracked:330-dtd,hist,fore:[hist[hist.length-1],...fore],labels,dates};
+}
+
+// CHART
+function initChart(){
+  priceChart=new Chart(document.getElementById('priceChart').getContext('2d'),{
+    type:'line',data:{labels:[],datasets:[]},
+    options:{
+      responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:isLightMode?'#e2ebe6':'#1a2e22',titleColor:isLightMode?'#3a6b52':'#7aab92',bodyColor:isLightMode?'#0b1a13':'#ddf0e8',borderColor:'rgba(80,180,120,0.28)',borderWidth:1,padding:14,cornerRadius:12,
+        callbacks:{title:i=>'Date: '+i[0].label,label:c=>c.parsed.y===null?null:`  ${c.datasetIndex===0?'Recorded':'Predicted'}: ${fmt(c.parsed.y)}`}}},
+      scales:{
+        x:{grid:{color:'rgba(80,180,120,0.04)'},ticks:{color:isLightMode?'#5a8a70':'#4a7a60',font:{family:"'Fira Code',monospace",size:10},maxTicksLimit:12,maxRotation:0}},
+        y:{position:'right',grid:{color:'rgba(80,180,120,0.04)'},ticks:{color:isLightMode?'#5a8a70':'#4a7a60',font:{family:"'Fira Code',monospace",size:10},callback:v=>'₹'+Number(v).toLocaleString('en-IN')}}
+      }
+    }
+  });
+}
+
+function renderChart(){
+  if(!currentData)return;
+  document.getElementById('empty-chart-msg').style.display='none';
+  const d=currentData;
+  
+  let si = 0;
+  if(currentZoom==='past90') si=Math.max(0,d.hist.length-90);
+  else if(currentZoom==='past30') si=Math.max(0,d.hist.length-30);
+  else if(currentZoom==='past7') si=Math.max(0,d.hist.length-7);
+  else if(currentZoom==='future') si=d.hist.length-1;
+
+  const labels=d.labels.slice(si);
+  const hD=new Array(labels.length).fill(null),fD=new Array(labels.length).fill(null);
+  for(let i=0;i<labels.length;i++){
+    const gi=si+i;
+    if(gi<d.hist.length)hD[i]=d.hist[gi];
+    if(gi>=d.hist.length-1){const fi=gi-(d.hist.length-1);if(fi<d.fore.length)fD[i]=d.fore[fi];}
+  }
+  priceChart.data.labels=labels;
+  priceChart.data.datasets=[
+    {label:'History',data:hD,borderColor:'#3ecf8e',backgroundColor:'rgba(62,207,142,0.08)',borderWidth:2,pointRadius:0,pointHoverRadius:5,fill:true,tension:0.3},
+    {label:'Forecast',data:fD,borderColor:'#ff8c00',borderWidth:2,borderDash:[5,5],pointRadius:0,pointHoverRadius:5,fill:false,tension:0.3}
+  ];
+  priceChart.update();
+}
+
+function setZoom(mode,btn){
+  currentZoom=mode;
+  document.querySelectorAll('.chart-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');renderChart();
+}
+
+// FEATURE 1: Savings Banner
+function renderSavingsBanner(cur,pred){
+  const banner=document.getElementById('savings-banner');
+  banner.classList.add('visible');
+  const saved=pred-cur;
+  const ticker=document.getElementById('savings-ticker');
+  if(saved>0){
+    document.getElementById('savings-headline').textContent='Book today & save '+fmt(saved);
+    document.getElementById('savings-sub').textContent='vs waiting until departure day ('+fmt(pred)+')';
+    document.getElementById('savings-headline').style.color='var(--green)';
+    ticker.style.color='var(--green)';
+    let c=0;const iv=setInterval(()=>{c=Math.min(c+Math.ceil(saved/40),saved);ticker.textContent='₹'+c.toLocaleString('en-IN');if(c>=saved)clearInterval(iv);},18);
+  } else {
+    document.getElementById('savings-headline').textContent='Fare is near its peak — act soon';
+    document.getElementById('savings-headline').style.color='var(--saffron)';
+    document.getElementById('savings-sub').textContent='Today\'s price is close to the departure-day forecast of '+fmt(pred);
+    ticker.style.color='var(--red)';
+    ticker.textContent='₹'+Math.abs(saved).toLocaleString('en-IN')+' above low';
+  }
+}
+
+// FEATURE 2: Price Alert
+function checkPriceAlert(){
+  if(!currentData){toast("Track a route first.");return;}
+  const v=parseInt(document.getElementById('alert-price-input').value);
+  if(!v||v<500){toast("Enter a valid target price.");return;}
+  const d=currentData;
+  const cur=d.hist[d.hist.length-1];
+  const res=document.getElementById('alert-result');
+  
+  // Scan for ALL dates in the next 330 days matching the target fare
+  const today = new Date(); today.setHours(0,0,0,0);
+  currentAlertMatches = [];
+  let absoluteMin = Infinity;
+  let minDateObj = null;
+  
+  for(let dbd = 0; dbd <= 330; dbd++){
+    const ad = new Date(today); ad.setDate(ad.getDate() + dbd);
+    const ds = getLocalDateString(ad);
+    const p = priceAt(d.orig, d.dest, ds, dbd);
+    
+    if(p < absoluteMin){
+      absoluteMin = p;
+      minDateObj = new Date(ad);
+    }
+    if(p <= v){
+      currentAlertMatches.push({ date: ad, ds: ds, price: p });
+    }
+  }
+
+  currentAlertTarget = v;
+  currentAlertTodayMatch = cur <= v;
+  currentAlertTodayFare = cur;
+  res.style.display='block';
+
+  if(v < absoluteMin * 0.75) {
+    // Target is unrealistically Low
+    res.className='alert-result visible miss';
+    res.innerHTML=`🚫 <strong>No tickets found.</strong> Target fare (${fmt(v)}) is unrealistically low for this route. The absolute cheapest fare in the next 330 days is <strong>${fmt(absoluteMin)}</strong> on ${fmtShort(minDateObj)}.`;
+  } else if(currentAlertMatches.length > 0){
+    // Target achievable on one or more dates
+    res.className='alert-result visible hit';
+    renderAlertMatches('date-asc'); // Default sort
+  } else {
+    // Target is possible historically, but unreachable in the current schedule
+    res.className='alert-result visible miss';
+    res.innerHTML=`⏳ Target is currently unreachable. The lowest predicted fare anywhere in the next 330 days is <strong>${fmt(absoluteMin)}</strong> on ${fmtShort(minDateObj)}. Try raising your target.`;
+  }
+}
+
+function renderAlertMatches(sortMode) {
+  const res = document.getElementById('alert-result');
+  
+  // Sort array based on selection
+  currentAlertMatches.sort((a, b) => {
+     if(sortMode === 'price-asc') return a.price - b.price || a.date - b.date;
+     if(sortMode === 'price-desc') return b.price - a.price || a.date - b.date;
+     if(sortMode === 'date-asc') return a.date - b.date;
+     if(sortMode === 'date-desc') return b.date - a.date;
+     return 0;
+  });
+
+  let html = '';
+  if (currentAlertTodayMatch) {
+     html += `✅ <strong>Target achieved for currently tracked date!</strong> Current fare ${fmt(currentAlertTodayFare)} ≤ ${fmt(currentAlertTarget)}. Book now!<br><br>`;
+  }
+  
+  html += `💡 <strong>Target fare (${fmt(currentAlertTarget)} or lower) available on ${currentAlertMatches.length} date(s):</strong><br>`;
+  
+  // Controls
+  html += `
+    <div class="alert-controls">
+       <span>Tap a date to re-track:</span>
+       <select class="alert-sort" onchange="renderAlertMatches(this.value)">
+          <option value="date-asc" ${sortMode==='date-asc'?'selected':''}>Date: Near to Far</option>
+          <option value="date-desc" ${sortMode==='date-desc'?'selected':''}>Date: Far to Near</option>
+          <option value="price-asc" ${sortMode==='price-asc'?'selected':''}>Price: Low to High</option>
+          <option value="price-desc" ${sortMode==='price-desc'?'selected':''}>Price: High to Low</option>
+       </select>
+    </div>
+  `;
+
+  // Clickable Tags
+  const dateStrList = currentAlertMatches.map(m => 
+    `<span class="alert-match-btn" onclick="jumpDate('${m.ds}')">${fmtShort(m.date)} <strong>${fmt(m.price)}</strong></span>`
+  ).join('');
+  
+  html += `<div style="max-height:140px; overflow-y:auto; padding-right:4px;">${dateStrList}</div>`;
+  res.innerHTML = html;
+}
+
+// FEATURE 3: Booking Score
+function renderScore(cur,low,pred,dtd){
+  const range=pred-low;
+  const pos=range>0?Math.max(0,Math.min(1,(pred-cur)/range)):0;
+  let tf=dtd>150?0.5:dtd>100?0.75:dtd>=40?1.0:dtd>=14?0.55:0.2;
+  const score=Math.round(pos*100*tf);
+
+  const arc=document.getElementById('gauge-arc');
+  setTimeout(()=>arc.style.strokeDashoffset=226-(226*score/100),80);
+
+  const numEl=document.getElementById('gauge-num');
+  let c=0;const iv=setInterval(()=>{
+    c=Math.min(c+Math.ceil(score/30),score);
+    numEl.textContent=c;
+    numEl.style.color=score>=70?'var(--green)':score>=45?'var(--blue)':score>=25?'var(--saffron)':'var(--red)';
+    if(c>=score)clearInterval(iv);
+  },22);
+
+  let grade,gc,desc;
+  if(score>=80){grade='A+  Exceptional Deal';gc='A';desc='Fare is significantly below its forecast peak. Strong buy signal.';}
+  else if(score>=65){grade='A  Good Buy';gc='A';desc='Well-positioned fare relative to the forecast trajectory.';}
+  else if(score>=45){grade='B  Fair Timing';gc='B';desc='Decent fare. Consider monitoring 1–2 more weeks for a potential dip.';}
+  else if(score>=25){grade='C  Elevated Risk';gc='C';desc='Price is elevated or departure is close. Proceed cautiously.';}
+  else{grade='D  Poor Timing';gc='D';desc='Near peak price or imminent departure. Only book if travel is urgent.';}
+
+  const g=document.getElementById('score-grade');
+  g.textContent=grade;g.className='score-grade '+gc;
+  document.getElementById('score-desc').textContent=desc;
+}
+
+// FEATURE 4: Flex Date Finder
+function renderFlexDates(orig,dest,depStr,dtd){
+  const dep=new Date(depStr);dep.setHours(0,0,0,0);
+  const today=new Date();today.setHours(0,0,0,0);
+  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let cells=[],minP=Infinity,minI=3;
+
+  for(let off=-3;off<=3;off++){
+    const d=new Date(dep);d.setDate(d.getDate()+off);
+    const dbd=Math.max(0,gap(today,d));
+    if(dbd<0){cells.push({past:true,d,off});continue;}
+    const ds=getLocalDateString(d);
+    const p=priceAt(orig,dest,ds,dbd);
+    if(p<minP){minP=p;minI=off+3;}
+    cells.push({past:false,d,off,p,ds});
+  }
+
+  document.getElementById('flex-grid').innerHTML=cells.map((c,i)=>{
+    if(c.past)return`<div class="flex-cell past"><div class="flex-day">${days[c.d.getDay()]}</div><div class="flex-date">${fmtShort(c.d)}</div><div class="flex-price">Past</div></div>`;
+    const cheap=i===minI,sel=c.off===0;
+    return`<div class="flex-cell${cheap?' cheapest':''}${sel?' selected':''}" onclick="jumpDate('${c.ds}')">
+      <div class="flex-day">${days[c.d.getDay()]}</div>
+      <div class="flex-date">${fmtShort(c.d)}</div>
+      <div class="flex-price">${fmt(c.p)}</div>
+      <div class="flex-badge">BEST</div>
+    </div>`;
+  }).join('');
+}
+
+function jumpDate(ds){
+  document.getElementById('inp-date').value=ds;
+  trackFlight();
+  toast('Re-tracked: '+new Date(ds).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),true);
+}
+
+// FEATURE 5: Best Day to Fly
+function renderBestDay(orig,dest,depStr){
+  const dep=new Date(depStr);dep.setHours(0,0,0,0);
+  const today=new Date();today.setHours(0,0,0,0);
+  const names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],namesLong=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const prices=[];
+
+  for(let dow=0;dow<7;dow++){
+    const d=new Date(dep);
+    const jsDow=(dow+1)%7;// Mon=1..Sun=0
+    let diff=(jsDow-d.getDay()+7)%7;
+    if(diff===0)diff=7;
+    d.setDate(d.getDate()+diff);
+    const dbd=Math.max(1,gap(today,d));
+    const ds=getLocalDateString(d);
+    prices.push({name:names[dow],long:namesLong[dow],p:priceAt(orig,dest,ds,dbd)});
+  }
+
+  const maxP=Math.max(...prices.map(x=>x.p)),minP=Math.min(...prices.map(x=>x.p));
+  const minI=prices.findIndex(x=>x.p===minP),maxI=prices.findIndex(x=>x.p===maxP);
+
+  document.getElementById('dow-chart').innerHTML=prices.map((x,i)=>{
+    const h=Math.round(18+((x.p-minP)/(maxP-minP||1))*64);
+    const cls=i===minI?'cheapest-day':i===maxI?'pricey-day':'mid-day';
+    return`<div class="dow-bar-wrap${i===minI?' best':''}">
+      <div class="dow-price-label">${(x.p/1000).toFixed(1)}k</div>
+      <div class="dow-bar ${cls}" style="height:${h}px;"></div>
+      <div class="dow-label">${x.name}</div>
+    </div>`;
+  }).join('');
+
+  const bl=document.getElementById('dow-best-label');
+  bl.style.display='block';
+  bl.innerHTML=`Cheapest: <span>${prices[minI].long}</span> (${fmt(minP)}) · Save ${fmt(maxP-minP)} vs ${prices[maxI].long}`;
+}
+
+// FEATURE 6: Demand + Social + Confidence
+function renderDemand(orig,dest,dtd){
+  const t1=INDIAN_AIRPORTS[orig]?.tier||3,t2=INDIAN_AIRPORTS[dest]?.tier||3;
+  const tierScore=(6-t1)+(6-t2);
+  const boost=dtd<30?0.28:dtd<60?0.14:0;
+  const raw=Math.min(1,(tierScore/8)+boost);
+  const pct=Math.round(raw*100);
+  const ring=document.getElementById('demand-ring');
+  let col=pct>70?'var(--red)':pct>45?'var(--saffron)':'var(--green)';
+  ring.style.stroke=col;
+  setTimeout(()=>ring.style.strokeDashoffset=214-(214*pct/100),100);
+  document.getElementById('demand-pct').textContent=pct+'%';
+  document.getElementById('demand-level').style.color=col;
+
+  const levels=[
+    {thr:75,lv:'HIGH',h:'Very High Demand',s:'Seats fill quickly. Expect aggressive price escalation near departure.'},
+    {thr:50,lv:'MED',h:'Moderate-High Demand',s:'Popular route. Book within the sweet spot (T-100 to T-40) for best fares.'},
+    {thr:28,lv:'LOW-M',h:'Steady Low-Medium',s:'Relatively stable demand. You have more flexibility but don\'t wait too long.'},
+    {thr:0,lv:'LOW',h:'Low Demand Corridor',s:'Fewer operators on this route. Fares may be higher but competition is limited.'}
+  ];
+  const lv=levels.find(l=>pct>=l.thr)||levels[3];
+  document.getElementById('demand-level').textContent=lv.lv;
+  document.getElementById('demand-headline').textContent=lv.h;
+  document.getElementById('demand-sub').textContent=lv.s;
+
+  // Social
+  const watch=Math.floor(40+pct*9+(330-dtd)*0.4);
+  document.getElementById('social-count').textContent=watch.toLocaleString('en-IN')+' travelers';
+  document.getElementById('social-urgency').textContent=pct>70?`Price changed ${Math.floor(Math.random()*3+2)}× in last 24h.`:pct>40?'Price changes expected soon.':'Fares relatively stable now.';
+  const em=['👨','👩','🧑','👦','👧'];
+  document.getElementById('social-avatars').innerHTML=em.slice(0,Math.min(5,Math.ceil(pct/20))).map(e=>`<div class="social-avatar">${e}</div>`).join('');
+
+  // Confidence
+  const hc=t1===1&&t2===1?94:t1+t2<=4?87:79;
+  const sc=83;
+  const tc=dtd>100?91:dtd>40?84:dtd>14?73:63;
+  const ov=Math.round((hc+sc+tc)/3);
+  const bars=[
+    {l:'Historical Data',v:hc,c:'var(--green)'},
+    {l:'Seasonal Model',v:sc,c:'var(--blue)'},
+    {l:'Time Horizon',v:tc,c:'var(--saffron)'},
+    {l:'Overall',v:ov,c:'var(--text)'}
+  ];
+  document.getElementById('confidence-bars').innerHTML=bars.map(b=>`
+    <div class="conf-row">
+      <div class="conf-label">${b.l}</div>
+      <div class="conf-track"><div class="conf-fill" style="background:${b.c};" data-w="${b.v}"></div></div>
+      <div class="conf-val">${b.v}%</div>
+    </div>`).join('');
+  setTimeout(()=>document.querySelectorAll('.conf-fill').forEach(e=>e.style.width=e.dataset.w+'%'),120);
+}
+
+// EXTENDED FEATURE 1: Price Heatmap Calendar
+function renderHeatmap(orig, dest, depStr) {
+  const dep = new Date(depStr); dep.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const grid = document.getElementById('heatmap-grid');
+  let cells = [];
+  let minP = Infinity, maxP = 0;
+
+  // 28 day window
+  for(let off = -14; off <= 13; off++) {
+    const d = new Date(dep); d.setDate(d.getDate() + off);
+    const dbd = Math.max(0, gap(today, d));
+    const ds = getLocalDateString(d); // Capture formatted date string
+    
+    if(dbd < 0) {
+       // Just put historical or generic filler for past dates so grid stays complete
+       cells.push({d, p: null, past: true, ds});
+       continue;
+    }
+    
+    const p = priceAt(orig, dest, ds, dbd);
+    if(p < minP) minP = p;
+    if(p > maxP) maxP = p;
+    cells.push({d, p, past: false, ds});
+  }
+
+  if(cells.length === 0) return;
+
+  grid.innerHTML = cells.map((c) => {
+    if (c.past) {
+        return `<div class="heatmap-cell" style="opacity:0.3; cursor:default;">
+          <div class="hm-day">${c.d.getDate()} ${c.d.toLocaleString('en-IN',{month:'short'})}</div>
+          Past
+        </div>`;
+    }
+    let cls = 'hm-mid';
+    const range = maxP - minP || 1;
+    const norm = (c.p - minP) / range;
+    if(norm < 0.33) cls = 'hm-low';
+    else if(norm > 0.66) cls = 'hm-high';
+    
+    return `<div class="heatmap-cell ${cls}" style="cursor:pointer;" onclick="jumpDate('${c.ds}')" title="Track ${fmtShort(c.d)}">
+      <div class="hm-day">${c.d.getDate()} ${c.d.toLocaleString('en-IN',{month:'short'})}</div>
+      ${fmt(c.p)}
+    </div>`;
+  }).join('');
+}
+
+// EXTENDED FEATURE 2: Route Comparison
+function compareRoute() {
+  if(!currentData){ toast("Track a primary route first."); return; }
+  const altDest = document.getElementById('compare-dest').value.trim().toUpperCase();
+  if(!altDest || !INDIAN_AIRPORTS[altDest]) { toast("Enter a valid Indian airport code."); return; }
+  if(altDest === currentData.orig) { toast("Alternative dest cannot be the origin."); return; }
+  if(altDest === currentData.dest) { toast("Alternative is same as current destination."); return; }
+
+  const depStr = document.getElementById('inp-date').value;
+  const altData = generateLifecycle(currentData.orig, altDest, depStr);
+
+  const curPrice = currentData.hist[currentData.hist.length-1];
+  const altPrice = altData.hist[altData.hist.length-1];
+
+  const maxP = Math.max(curPrice, altPrice);
+  const res = document.getElementById('compare-result');
+  res.style.display = 'block';
+
+  res.innerHTML = `
+    <div style="font-size:0.75rem;font-family:var(--mono);margin-bottom:8px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;">Fares for ${fmtShort(currentData.dep)}</div>
+    <div style="margin-bottom:12px;">
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600;">
+         <span>${currentData.orig} → ${currentData.dest} (Tracked)</span>
+         <span>${fmt(curPrice)}</span>
+      </div>
+      <div class="season-bar-wrap" style="height:12px;"><div class="compare-bar" style="width:0%; background:var(--saffron); height:100%; margin:0;" id="comp-bar-1"></div></div>
+    </div>
+    <div>
+      <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600;">
+         <span>${currentData.orig} → ${altDest} (Alternative)</span>
+         <span>${fmt(altPrice)}</span>
+      </div>
+      <div class="season-bar-wrap" style="height:12px;"><div class="compare-bar" style="width:0%; background:var(--blue); height:100%; margin:0;" id="comp-bar-2"></div></div>
+    </div>
+    <div style="margin-top:12px; font-size:0.75rem; color:var(--text3); line-height:1.5;">
+      ${curPrice < altPrice ? `Your current route is <strong>${fmt(altPrice - curPrice)} cheaper</strong> than flying to ${altDest}.` : `Switching to ${altDest} could save you <strong style="color:var(--green);">${fmt(curPrice - altPrice)}</strong> today.`}
+    </div>
+  `;
+  
+  setTimeout(() => {
+     document.getElementById('comp-bar-1').style.width = `${(curPrice/maxP)*100}%`;
+     document.getElementById('comp-bar-2').style.width = `${(altPrice/maxP)*100}%`;
+  }, 50);
+}
+
+// EXTENDED FEATURE 3: Fare History Breakdown
+function renderSeasonality(base) {
+  const peak = Math.round((base * 1.35)/10)*10;
+  const shoulder = Math.round(base/10)*10;
+  const off = Math.round((base * 0.75)/10)*10;
+  const maxP = peak;
+
+  const cont = document.getElementById('season-breakdown');
+  cont.style.opacity = '1';
+  cont.innerHTML = `
+    <div>
+      <div class="season-row">
+        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Peak Season (Oct-Dec)</span>
+        <span style="font-size:0.85rem;font-weight:700;">~${fmt(peak)}</span>
+      </div>
+      <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--red);" id="seas-bar-1"></div></div>
+    </div>
+    <div>
+      <div class="season-row">
+        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Shoulder Season (Feb-Apr)</span>
+        <span style="font-size:0.85rem;font-weight:700;">~${fmt(shoulder)}</span>
+      </div>
+      <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--blue);" id="seas-bar-2"></div></div>
+    </div>
+    <div>
+      <div class="season-row">
+        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Off-Season (Jul-Sep)</span>
+        <span style="font-size:0.85rem;font-weight:700;">~${fmt(off)}</span>
+      </div>
+      <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--green);" id="seas-bar-3"></div></div>
+    </div>
+  `;
+
+  setTimeout(() => {
+    document.getElementById('seas-bar-1').style.width = `${(peak/maxP)*100}%`;
+    document.getElementById('seas-bar-2').style.width = `${(shoulder/maxP)*100}%`;
+    document.getElementById('seas-bar-3').style.width = `${(off/maxP)*100}%`;
+  }, 50);
+}
+
+// EXTENDED FEATURE 4: Animated Flight Path
+function renderFlightPath(orig, dest) {
+  const cont = document.getElementById('flight-path-container');
+  const oNode = INDIAN_AIRPORTS[orig];
+  const dNode = INDIAN_AIRPORTS[dest];
+
+  if (!oNode || !dNode || !oNode.lat || !dNode.lat) {
+    cont.innerHTML = `<div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Path mapping unavailable</div>`;
+    if (flightMap) { flightMap.remove(); flightMap = null; }
+    return;
+  }
+
+  // Initialize the precise geographical map background exactly once
+  if (!flightMap) {
+    cont.innerHTML = `
+      <div id="leaflet-map" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; background:transparent;"></div>
+      <svg id="flight-svg-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:2; pointer-events:none; overflow:visible;"></svg>
+    `;
+    
+    flightMap = L.map('leaflet-map', {
+      zoomControl: true, // Enabled Zoom Controls
+      dragging: true,    // Enabled Panning
+      scrollWheelZoom: true, // Enabled Scroll Zoom
+      doubleClickZoom: true,
+      boxZoom: true,
+      keyboard: false,
+      attributionControl: false
+    });
+    
+    // Apply matching map theme layer
+    updateMapTheme();
+  }
+
+  // Clear previous event listeners to prevent duplicate overlay drawing on new searches
+  flightMap.off('move');
+  flightMap.off('zoom');
+
+  flightMap.invalidateSize();
+  // Geographically bound to perfectly frame India
+  flightMap.fitBounds([[7.0, 67.0], [36.0, 98.0]]);
+
+  const drawOverlay = () => {
+     const svgOverlay = document.getElementById('flight-svg-overlay');
+     if(!svgOverlay) return;
+
+     // Fetch exact pixel coordinates relative to the container using Leaflet Projection
+     const p1 = flightMap.latLngToContainerPoint([oNode.lat, oNode.lon]);
+     const p2 = flightMap.latLngToContainerPoint([dNode.lat, dNode.lon]);
+
+     const dx = p2.x - p1.x;
+     const dy = p2.y - p1.y;
+     const dist = Math.sqrt(dx*dx + dy*dy);
+     const arcFactor = dist > 40 ? 0.15 : 0.25; 
+     const cx = (p1.x + p2.x)/2 - dy * arcFactor;
+     const cy = (p1.y + p2.y)/2 + dx * arcFactor;
+
+     // Inject the dynamic overlay synced with real map pixel locations
+     svgOverlay.innerHTML = `
+       <defs>
+         <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+           <stop offset="0%" stop-color="#4db8a0"/>
+           <stop offset="100%" stop-color="#ff8c00"/>
+         </linearGradient>
+         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+         </filter>
+       </defs>
+       
+       <!-- Flight Arc Curve -->
+       <path id="flight-arc" d="M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}" fill="none" stroke="url(#pathGrad)" stroke-width="1.5" stroke-dasharray="3,3"/>
+       
+       <!-- Animated Plane -->
+       <g>
+          <path d="M 4 0 L -3 -3 L -1 0 L -3 3 Z" fill="#ff8c00" filter="url(#glow)"/>
+          <animateMotion dur="${Math.max(1.5, dist/50)}s" repeatCount="indefinite" path="M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}" rotate="auto"/>
+       </g>
+       
+       <!-- Origin Marker -->
+       <circle cx="${p1.x}" cy="${p1.y}" r="3" fill="var(--bg2)" stroke="var(--blue)" stroke-width="2"/>
+       <text x="${p1.x}" y="${p1.y - 8}" fill="var(--text)" font-size="10" font-weight="600" font-family="var(--mono)" text-anchor="middle" style="text-shadow: 0 1px 3px var(--bg1), 0 -1px 3px var(--bg1), 1px 0 3px var(--bg1), -1px 0 3px var(--bg1);">${orig}</text>
+       
+       <!-- Destination Marker -->
+       <circle cx="${p2.x}" cy="${p2.y}" r="3" fill="var(--saffron)" stroke="var(--bg2)" stroke-width="2" filter="url(#glow)"/>
+       <text x="${p2.x}" y="${p2.y - 8}" fill="var(--text)" font-size="10" font-weight="600" font-family="var(--mono)" text-anchor="middle" style="text-shadow: 0 1px 3px var(--bg1), 0 -1px 3px var(--bg1), 1px 0 3px var(--bg1), -1px 0 3px var(--bg1);">${dest}</text>
+     `;
+  };
+
+  // Run the overlay draw after a slight delay to allow the geographical tiles to stabilize bounds
+  setTimeout(drawOverlay, 50);
+
+  // Sync overlay drawing when map pans or zooms
+  flightMap.on('move', drawOverlay);
+  flightMap.on('zoom', drawOverlay);
+}
+
+// SHARE
+function shareDeal(){
+  if(!currentData){toast("Track a route first.");return;}
+  const d=currentData,cur=d.hist[d.hist.length-1];
+  const oN=INDIAN_AIRPORTS[d.orig]?.name||d.orig,dN=INDIAN_AIRPORTS[d.dest]?.name||d.dest;
+  const txt=`✈ SkyTracker India\n${oN} → ${dN}\nFare: ${fmt(cur)} · ${fmtDate(d.dep)}\nTracked via SkyTracker India`;
+  if(navigator.share){navigator.share({title:'SkyTracker India',text:txt});}
+  else{navigator.clipboard.writeText(txt).then(()=>toast('✅ Deal copied to clipboard!',true));}
+}
+
+// MAIN UPDATE
+function updateUI(){
+  const d=currentData;if(!d)return;
+  const cur=d.hist[d.hist.length-1],init=d.hist[0];
+  const low=Math.min(...d.hist),lowI=d.hist.indexOf(low);
+  const pred=d.fore[d.fore.length-1];
+
+  document.getElementById('lifecycle-bar').style.opacity='1';
+  document.getElementById('date-listed').textContent=fmtDate(d.listed);
+  document.getElementById('date-today').textContent=fmtDate(d.today);
+  document.getElementById('date-depart').textContent=fmtDate(d.dep);
+  const pct=Math.round((d.tracked/330)*100);
+  document.getElementById('lc-progress').style.width=pct+'%';
+  document.getElementById('lc-pct-badge').textContent=pct+'% elapsed';
+  document.getElementById('step-listed').className='lc-step active';
+  document.getElementById('step-today').className='lc-step active';
+  document.getElementById('step-depart').className=d.dtd===0?'lc-step active':'lc-step future';
+
+  document.getElementById('m-initial').textContent=fmt(init);
+  document.getElementById('m-current').textContent=fmt(cur);
+  const oT=INDIAN_AIRPORTS[d.orig]?.tier||'?',dT=INDIAN_AIRPORTS[d.dest]?.tier||'?';
+  document.getElementById('m-current-sub').innerHTML=`${d.orig} (T${oT}) → ${d.dest} (T${dT})`;
+  document.getElementById('m-low').textContent=fmt(low);
+  document.getElementById('m-low-sub').textContent='Lowest since listing';
+  document.getElementById('m-low-date').textContent='on '+fmtDate(d.dates[lowI]);
+  const mp=document.getElementById('m-pred');mp.textContent=fmt(pred);mp.className='metric-value '+(pred>cur?'up':'down');
+  document.getElementById('m-status').textContent=`T − ${d.dtd}`;
+  document.getElementById('m-status-sub').textContent=`Day ${d.tracked} of 330`;
+
+  const oN=INDIAN_AIRPORTS[d.orig]?.name||d.orig,dN=INDIAN_AIRPORTS[d.dest]?.name||d.dest;
+  document.getElementById('chart-title').innerHTML=`${oN} <span style="opacity:0.45">→</span> ${dN}`;
+
+  const chg=((cur-init)/init*100).toFixed(1);
+  document.getElementById('stat-base').innerHTML=`${fmt(d.base)}<span class="route-badge">Tier ${oT}→${dT}</span>`;
+  document.getElementById('stat-tracked').textContent=`${d.tracked} days`;
+  document.getElementById('stat-vs-init').textContent=`${chg>0?'+':''}${chg}%`;
+  let trend='N/A (new route)';
+  if(d.hist.length>7){const diff=cur-d.hist[d.hist.length-8];trend=`${diff>0?'+':''}${fmt(diff)}`;}
+  document.getElementById('stat-trend').textContent=trend;
+
+  const rb=document.getElementById('rec-box');rb.className='recommendation-box';rb.style.opacity='1';
+  const ra=document.getElementById('rec-action'),rd=document.getElementById('rec-detail');
+  if(d.dtd>100){rb.classList.add('rec-wait');ra.textContent='⏳ Wait — Too Early';rd.textContent=`${d.dtd} days out. Prime window is T-100 to T-40. Monitor for the coming dip.`;}
+  else if(d.dtd>40){
+    if(cur<=low*1.08){rb.classList.add('rec-buy');ra.textContent='✓ Book Now — Prime Window';rd.textContent=`You're in the sweet spot at near-lowest fare (${fmt(cur)}). Prices will likely rise from here.`;}
+    else{rb.classList.add('rec-wait');ra.textContent='👀 Monitor Closely';rd.textContent=`Prime window but fares are elevated. A dip may come before the T-21 surge.`;}
+  }else if(d.dtd>14){rb.classList.add('rec-caution');ra.textContent='⚠ Act Fast — Prices Rising';rd.textContent=`Discount window closed. Forecast: ${fmt(pred)} by departure.`;}
+  else{rb.classList.add('rec-caution');ra.textContent='🚨 Last-Minute Premium';rd.textContent=`Under 14 days out. Expect surge pricing up to ${fmt(pred)}.`;}
+
+  document.getElementById('alert-result').className='alert-result';
+
+  // Core features
+  renderSavingsBanner(cur,pred);
+  renderScore(cur,low,pred,d.dtd);
+  const localDepStr = getLocalDateString(d.dep);
+  renderFlexDates(d.orig,d.dest,localDepStr,d.dtd);
+  renderBestDay(d.orig,d.dest,localDepStr);
+  renderDemand(d.orig,d.dest,d.dtd);
+
+  // New Extended Features
+  renderHeatmap(d.orig, d.dest, localDepStr);
+  renderSeasonality(d.base);
+  renderFlightPath(d.orig, d.dest);
+  document.getElementById('compare-result').style.display = 'none';
+  document.getElementById('compare-dest').value = '';
+}
+
+function trackFlight(){
+  const orig=document.getElementById('inp-origin').value.trim().toUpperCase();
+  const dest=document.getElementById('inp-dest').value.trim().toUpperCase();
+  const ds=document.getElementById('inp-date').value;
+  if(!orig||!dest||!ds){toast("Enter Origin, Destination, and Date.");return;}
+  if(orig===dest){toast("Origin and Destination must differ.");return;}
+  if(!INDIAN_AIRPORTS[orig]||!INDIAN_AIRPORTS[dest])toast("Note: One code isn't in our primary DB. Estimating.");
+  const data=generateLifecycle(orig,dest,ds);
+  if(data){currentData=data;renderChart();updateUI();}
+}
+
+function updateClock(){
+  document.getElementById('current-time').textContent=
+    new Date().toLocaleDateString('en-IN',{weekday:'short',month:'short',day:'numeric'})+'  ·  '+
+    new Date().toLocaleTimeString('en-IN');
+  checkTimeTheme();
+}
+
+window.addEventListener('load',()=>{
+  populateAirports();
+  const d=new Date();d.setDate(d.getDate()+60);
+  document.getElementById('inp-date').value=getLocalDateString(d);
+  checkTimeTheme();
+  initChart();
+  updateClock();
+  setInterval(updateClock,1000);
+});
+</script>
+</body>
+</html>
