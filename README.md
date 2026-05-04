@@ -2,7 +2,9 @@
 
 > **Smart Flight Pricing Intelligence for Indian Domestic Flights**
 
-A sophisticated flight pricing tracker that monitors airfare trends across India's 70+ airports, visualizes 330-day booking lifecycles, forecasts future fares, and empowers travelers to make informed, cost-effective flight decisions.
+🔗 **[Live Demo](https://punitpritam788.github.io/SkyTracker-India/)**
+
+A sophisticated flight pricing tracker that monitors airfare trends across India's 70+ airports, visualizes 330-day booking lifecycles, forecasts future fares, and empowers travelers to make informed booking decisions.
 
 ![GitHub](https://img.shields.io/badge/License-MIT-blue)
 ![HTML](https://img.shields.io/badge/Built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-orange)
