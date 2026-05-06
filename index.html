@@ -59,15 +59,15 @@
   .theme-btn { padding: 7px; width: 34px; height: 34px; justify-content: center; }
   .theme-btn:hover, .share-btn:hover { border-color:var(--border2); color:var(--text); }
 
-  .container { max-width:1280px; margin:0 auto; padding:var(--sp-xl); }
+  .container { max-width:1600px; margin:0 auto; padding:clamp(16px, 3vw, 32px); }
 
   /* HERO */
   .hero-band { padding:var(--sp-xxl) 0 var(--sp-xl); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-base); }
-  .hero-title { font-size:clamp(1.75rem, 5vw, 2.5rem); font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
+  .hero-title { font-size:clamp(1.75rem, 5vw, 3.5rem); font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
   .hero-title span { color:var(--saffron); }
-  .hero-sub { font-size:clamp(0.75rem, 2.5vw, 0.85rem); color:var(--text3); font-family:var(--mono); margin-top:6px; }
+  .hero-sub { font-size:clamp(0.75rem, 2.5vw, 1.1rem); color:var(--text3); font-family:var(--mono); margin-top:6px; }
   .hero-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-start; }
-  .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:0.72rem; font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
+  .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
   .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; box-shadow:0 0 6px var(--green); }
 
   /* SEARCH PILL */
@@ -101,82 +101,82 @@
   .savings-ticker { font-size:2rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; }
   .savings-ticker-label { font-size:0.62rem; font-family:var(--mono); color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
 
-  /* LIFECYCLE */
-  .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl) var(--sp-xl) var(--sp-lg); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; }
-  .lifecycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--sp-md); }
+  /* LIFECYCLE PROGRESS */
+  .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .lifecycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(12px, 2vw, 24px); flex-wrap:wrap; gap:8px; }
   .lc-card-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
-  .lc-pct-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:3px 12px; font-size:0.72rem; font-family:var(--mono); color:var(--green); }
+  .lc-pct-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:clamp(4px, 1.5vw, 8px) clamp(10px, 2vw, 18px); font-size:0.72rem; font-family:var(--mono); color:var(--green); }
   
-  .lc-track-wrap { position:relative; padding:16px 0; margin-top:8px; }
-  .lc-rail { position:absolute; top:50%; left:16px; right:16px; height:4px; transform:translateY(-50%); background:var(--bg3); border-radius:var(--radius-full); z-index:0; margin:0; }
+  .lc-track-wrap { position:relative; padding:clamp(16px, 3vw, 24px) 0; margin-top:8px; }
+  .lc-rail { position:absolute; top:50%; left:16px; right:16px; height:clamp(4px, 1vw, 6px); transform:translateY(-50%); background:var(--bg3); border-radius:var(--radius-full); z-index:0; margin:0; }
   .lc-rail-fill { height:100%; background:linear-gradient(90deg,var(--green),var(--blue)); border-radius:var(--radius-full); transition:width 1s cubic-bezier(0.4,0,0.2,1); width:0%; }
   .lc-steps { display:flex; justify-content:space-between; position:relative; z-index:1; }
-  .lc-step { display:flex; flex-direction:row; align-items:center; gap:8px; background:var(--bg1); padding:4px 12px 4px 4px; border-radius:var(--radius-full); transition:background 0.4s; }
+  .lc-step { display:flex; flex-direction:row; align-items:center; gap:clamp(6px, 1vw, 12px); background:var(--bg1); padding:clamp(4px, 1vw, 8px) clamp(12px, 2vw, 16px) clamp(4px, 1vw, 8px) clamp(4px, 1vw, 8px); border-radius:var(--radius-full); transition:background 0.4s; }
   .lc-step:first-child { padding-left:0; }
-  .lc-step:last-child { padding-right:0; padding-left:12px; }
-  .lc-step-text { display:flex; align-items:center; gap:6px; }
-  .lc-dot-outer { width:32px; height:32px; flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg2); border:2px solid var(--border2); transition:all 0.3s; }
-  .lc-dot-inner { width:10px; height:10px; border-radius:50%; background:var(--text3); transition:all 0.3s; }
+  .lc-step:last-child { padding-right:0; padding-left:clamp(12px, 2vw, 16px); }
+  .lc-step-text { display:flex; align-items:center; gap:clamp(4px, 1vw, 8px); }
+  .lc-dot-outer { width:clamp(24px, 4vw, 36px); height:clamp(24px, 4vw, 36px); flex-shrink:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg2); border:2px solid var(--border2); transition:all 0.3s; }
+  .lc-dot-inner { width:clamp(8px, 1.5vw, 12px); height:clamp(8px, 1.5vw, 12px); border-radius:50%; background:var(--text3); transition:all 0.3s; }
   .lc-step.active .lc-dot-outer { background:rgba(62,207,142,0.12); border-color:var(--green); box-shadow:0 0 0 4px rgba(62,207,142,0.08); }
   .lc-step.active .lc-dot-inner { background:var(--green); }
   .lc-step.future .lc-dot-outer { border-style:dashed; border-color:var(--saffron); }
   .lc-step.future .lc-dot-inner { background:var(--saffron); opacity:0.5; }
   .lc-step-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); }
-  .lc-step-date { font-size:0.75rem; font-weight:600; color:var(--text); white-space:nowrap; }
+  .lc-step-date { font-size:0.82rem; font-weight:600; color:var(--text); white-space:nowrap; }
 
-  /* METRICS */
-  .metrics-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:var(--sp-md); margin-bottom:var(--sp-xl); }
-  .metric-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-lg); cursor:default; transition:box-shadow 0.2s,transform 0.2s, background 0.4s, border-color 0.4s; position:relative; overflow:hidden; }
+  /* METRICS ROW (FULLY SCALABLE) */
+  .metrics-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:clamp(10px, 2vw, 24px); margin-bottom:var(--sp-xl); }
+  .metric-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 2.5vw, 28px); cursor:default; transition:box-shadow 0.2s,transform 0.2s, background 0.4s, border-color 0.4s; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
   .metric-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
-  .metric-card::after { content:''; position:absolute; top:0; left:var(--sp-lg); right:var(--sp-lg); height:2px; border-radius:0 0 2px 2px; }
+  .metric-card::after { content:''; position:absolute; top:0; left:clamp(16px, 2.5vw, 28px); right:clamp(16px, 2.5vw, 28px); height:3px; border-radius:0 0 3px 3px; }
   .metric-card.saffron::after{background:var(--saffron);} .metric-card.green::after{background:var(--green);} .metric-card.red::after{background:var(--red);} .metric-card.blue::after{background:var(--blue);} .metric-card.neutral::after{background:var(--text3);}
-  .metric-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:var(--sp-sm); }
-  .metric-value { font-size:1.45rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.03em; line-height:1; margin-bottom:var(--sp-xs); }
+  .metric-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:6px; line-height:1.4; word-break:break-word; }
+  .metric-value { font-size:1.45rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.03em; line-height:1; margin-bottom:6px; word-break:break-word; }
   .metric-value.up{color:var(--red);} .metric-value.down{color:var(--green);} .metric-value.neutral{color:var(--text);}
-  .metric-sub { font-size:0.7rem; color:var(--text3); font-family:var(--mono); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .metric-sub { font-size:0.7rem; color:var(--text3); font-family:var(--mono); line-height:1.4; word-break:break-word; }
 
   /* CONTENT GRID */
   .content-grid { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-bottom:var(--sp-xl); width: 100%; }
   .content-grid > .panel:first-child { flex: 999 1 min(100%, 550px); min-width:0; }
   .content-grid > .panel:last-child { flex: 1 1 min(100%, 360px); min-width:0; }
-  .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; }
-  .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--sp-lg); flex-wrap:wrap; gap:12px; }
-  .panel-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); }
+  .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(16px, 2vw, 24px); flex-wrap:wrap; gap:12px; }
+  .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); }
   .chart-tabs { display:flex; flex-wrap:wrap; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-md); padding:4px; width: 100%; max-width: max-content; }
-  .chart-tab { padding:5px 14px; border-radius:var(--radius-full); font-size:0.7rem; font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; flex:1 1 auto; text-align:center; }
+  .chart-tab { padding:clamp(5px, 1vw, 8px) clamp(10px, 2vw, 16px); border-radius:var(--radius-full); font-size:clamp(0.65rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; flex:1 1 auto; text-align:center; }
   .chart-tab.active { background:var(--bg3); color:var(--saffron); }
   .chart-tab:hover:not(.active) { color:var(--text2); }
   .chart-wrap { position:relative; flex-grow:1; min-height:320px; width:100%; overflow:hidden; }
-  .empty-overlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--overlay-bg); backdrop-filter:blur(4px); z-index:10; border-radius:var(--radius-sm); color:var(--text2); font-family:var(--mono); font-size:0.88rem; text-align:center; padding:var(--sp-xl); line-height:1.7; transition: background 0.4s; }
-  .empty-icon { font-size:2rem; margin-bottom:var(--sp-base); opacity:0.4; }
-  .chart-legend { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-top:var(--sp-base); font-size:0.72rem; font-family:var(--mono); color:var(--text3); justify-content:center; }
+  .empty-overlay { position:absolute; top:0; left:0; right:0; bottom:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--overlay-bg); backdrop-filter:blur(4px); z-index:10; border-radius:var(--radius-sm); color:var(--text2); font-family:var(--mono); font-size:clamp(0.85rem, 1.5vw, 1.1rem); text-align:center; padding:var(--sp-xl); line-height:1.7; transition: background 0.4s; }
+  .empty-icon { font-size:clamp(2rem, 4vw, 3rem); margin-bottom:var(--sp-base); opacity:0.4; }
+  .chart-legend { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-top:var(--sp-base); font-size:clamp(0.7rem, 1.2vw, 0.9rem); font-family:var(--mono); color:var(--text3); justify-content:center; }
   .legend-item { display:flex; align-items:center; gap:8px; }
   .legend-line { width:20px; height:2px; border-radius:2px; }
-  .recommendation-box { border-radius:var(--radius-md); padding:var(--sp-lg); margin-bottom:var(--sp-base); border:1px solid; transition:all 0.3s; }
+  .recommendation-box { border-radius:var(--radius-md); padding:clamp(16px, 2vw, 24px); margin-bottom:var(--sp-base); border:1px solid; transition:all 0.3s; }
   .rec-buy{background:var(--green-dim);border-color:rgba(62,207,142,0.3);} .rec-wait{background:var(--saffron-dim);border-color:rgba(255,140,0,0.3);} .rec-caution{background:var(--red-dim);border-color:rgba(240,80,96,0.3);}
-  .rec-action { font-size:1rem; font-weight:700; margin-bottom:8px; }
+  .rec-action { font-size:clamp(1rem, 2vw, 1.3rem); font-weight:700; margin-bottom:8px; }
   .rec-buy .rec-action{color:var(--green);} .rec-wait .rec-action{color:var(--saffron);} .rec-caution .rec-action{color:var(--red);}
-  .rec-detail { font-size:0.82rem; color:var(--text2); line-height:1.65; }
-  .stat-row { display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--border); }
+  .rec-detail { font-size:clamp(0.8rem, 1.5vw, 1rem); color:var(--text2); line-height:1.65; }
+  .stat-row { display:flex; justify-content:space-between; align-items:center; padding:clamp(12px, 1.5vw, 16px) 0; border-bottom:1px solid var(--border); }
   .stat-row:last-child{border-bottom:none;}
-  .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; }
-  .stat-row-value { font-weight:600; font-family:var(--mono); font-size:0.88rem; color:var(--text); }
-  .route-badge { display:inline-flex; align-items:center; padding:2px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.68rem; color:var(--saffron); margin-left:8px; }
+  .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); text-transform:uppercase; letter-spacing:0.06em; }
+  .stat-row-value { font-weight:600; font-family:var(--mono); font-size:clamp(0.85rem, 1.8vw, 1.1rem); color:var(--text); }
+  .route-badge { display:inline-flex; align-items:center; padding:2px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.6rem; color:var(--saffron); margin-left:8px; }
 
   /* FEATURE 2 — PRICE ALERT */
   .alert-section { margin-top:var(--sp-base); padding-top:var(--sp-base); border-top:1px solid var(--border); }
-  .alert-label { font-size:0.68rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
-  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; }
-  .alert-input { flex:1 1 150px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:0.9rem; padding:9px 12px; outline:none; transition:all 0.4s; text-transform:uppercase; }
+  .alert-label { font-size:clamp(0.65rem, 1.5vw, 0.9rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
+  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .alert-input { flex:1 1 auto; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:16px; padding:0 12px; height:42px; outline:none; transition:all 0.4s; text-transform:uppercase; min-width:0; }
   .alert-input:focus { border-color:var(--saffron); }
-  .alert-btn { flex:1 1 auto; background:var(--saffron); color:#000; border:none; border-radius:var(--radius-sm); padding:9px 16px; font-size:0.82rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; white-space:nowrap; text-align:center; }
+  .alert-btn { flex:0 0 auto; background:var(--saffron); color:#000; border:none; border-radius:var(--radius-sm); padding:0 16px; height:42px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; white-space:nowrap; text-align:center; }
   .alert-btn:hover { opacity:0.85; }
-  .alert-result { margin-top:10px; font-size:0.8rem; font-family:var(--mono); line-height:1.6; padding:10px 12px; background:var(--bg2); border-radius:var(--radius-sm); color:var(--text2); display:none; transition: all 0.4s; }
+  .alert-result { margin-top:10px; font-size:clamp(0.8rem, 1.5vw, 1rem); font-family:var(--mono); line-height:1.6; padding:12px 16px; background:var(--bg2); border-radius:var(--radius-sm); color:var(--text2); display:none; transition: all 0.4s; }
   .alert-result.visible{display:block;} .alert-result.hit{color:var(--green);} .alert-result.miss{color:var(--saffron);} .alert-result.future{color:var(--blue);}
   
-  .alert-controls { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:10px; margin-bottom:6px; font-size:0.75rem; }
-  .alert-sort { background:var(--bg1); border:1px solid var(--border); color:var(--text); font-family:var(--mono); font-size:0.7rem; padding:4px 8px; border-radius:4px; outline:none; cursor:pointer; flex: 1 1 150px; }
-  .alert-match-btn { display:inline-block; margin:3px 4px 3px 0; padding:4px 8px; background:var(--bg1); border:1px solid var(--border); border-radius:4px; font-size:0.75rem; color:var(--text); cursor:pointer; transition:all 0.15s; }
+  .alert-controls { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:12px; margin-bottom:8px; font-size:clamp(0.7rem, 1.5vw, 0.9rem); }
+  .alert-sort { background:var(--bg1); border:1px solid var(--border); color:var(--text); font-family:var(--mono); font-size:clamp(0.65rem, 1.2vw, 0.85rem); padding:6px 10px; border-radius:4px; outline:none; cursor:pointer; flex: 1 1 150px; }
+  .alert-match-btn { display:inline-block; margin:4px 6px 4px 0; padding:6px 10px; background:var(--bg1); border:1px solid var(--border); border-radius:4px; font-size:clamp(0.7rem, 1.2vw, 0.9rem); color:var(--text); cursor:pointer; transition:all 0.15s; }
   .alert-match-btn:hover { border-color:var(--saffron); transform:translateY(-1px); box-shadow:var(--shadow-pill); }
   .alert-match-btn strong { color:var(--green); margin-left:4px; }
 
@@ -190,14 +190,14 @@
   .gauge-svg-wrap svg { width:100%; height:100%; overflow:visible; }
   .gauge-score-text { position:absolute; bottom:0; left:50%; transform:translateX(-50%); text-align:center; white-space:nowrap; }
   .gauge-score-num { font-size:clamp(1.8rem, 6vw, 2.4rem); font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; line-height:1; }
-  .gauge-score-label { font-size:0.62rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
-  .score-grade { font-size:clamp(0.75rem, 2.5vw, 0.9rem); font-weight:700; margin-top:12px; padding:4px 20px; border-radius:var(--radius-full); font-family:var(--mono); border:1px solid; transition: all 0.4s; text-align:center; }
+  .gauge-score-label { font-size:clamp(0.55rem, 1.5vw, 0.75rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
+  .score-grade { font-size:clamp(0.75rem, 2.5vw, 1rem); font-weight:700; margin-top:16px; padding:6px 24px; border-radius:var(--radius-full); font-family:var(--mono); border:1px solid; transition: all 0.4s; text-align:center; }
   .score-grade.A{background:rgba(62,207,142,0.15);color:var(--green);border-color:rgba(62,207,142,0.3);}
   .score-grade.B{background:rgba(77,184,160,0.15);color:var(--blue);border-color:rgba(77,184,160,0.3);}
   .score-grade.C{background:var(--saffron-dim);color:var(--saffron);border-color:rgba(255,140,0,0.3);}
   .score-grade.D{background:var(--red-dim);color:var(--red);border-color:rgba(240,80,96,0.3);}
   .score-grade.none{background:var(--bg2);color:var(--text3);border-color:var(--border);}
-  .score-desc { font-size:0.75rem; color:var(--text2); text-align:center; margin-top:10px; line-height:1.6; flex-grow:1; }
+  .score-desc { font-size:clamp(0.75rem, 1.8vw, 0.95rem); color:var(--text2); text-align:center; margin-top:12px; line-height:1.6; flex-grow:1; }
 
   /* FEATURE 4 — FLEX DATE FINDER */
   .flex-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 5px); margin-top:var(--sp-sm); width:100%; }
@@ -206,57 +206,57 @@
   .flex-cell.cheapest { background:rgba(62,207,142,0.1); border-color:rgba(62,207,142,0.4); }
   .flex-cell.selected { background:var(--bg3); border-color:var(--saffron); }
   .flex-cell.past { opacity:0.3; cursor:default; pointer-events:none; }
-  .flex-day { font-size:clamp(0.45rem, 1.2vw, 0.58rem); font-family:var(--mono); text-transform:uppercase; color:var(--text3); letter-spacing:0.04em; }
-  .flex-date { font-size:clamp(0.6rem, 1.8vw, 0.7rem); font-weight:600; color:var(--text); margin:3px 0; }
-  .flex-price { font-size:clamp(0.55rem, 1.5vw, 0.62rem); font-family:var(--mono); color:var(--text2); }
+  .flex-day { font-size:clamp(0.45rem, 1.2vw, 0.65rem); font-family:var(--mono); text-transform:uppercase; color:var(--text3); letter-spacing:0.04em; }
+  .flex-date { font-size:clamp(0.6rem, 1.8vw, 0.85rem); font-weight:600; color:var(--text); margin:3px 0; }
+  .flex-price { font-size:clamp(0.55rem, 1.5vw, 0.75rem); font-family:var(--mono); color:var(--text2); }
   .flex-cell.cheapest .flex-price { color:var(--green); font-weight:600; }
   .flex-cell.selected .flex-price { color:var(--saffron); }
-  .flex-badge { font-size:0.52rem; background:var(--green); color:#000; border-radius:var(--radius-full); padding:1px 5px; margin-top:3px; display:none; font-weight:700; }
+  .flex-badge { font-size:clamp(0.5rem, 1vw, 0.65rem); background:var(--green); color:#000; border-radius:var(--radius-full); padding:1px 6px; margin-top:4px; display:none; font-weight:700; }
   .flex-cell.cheapest .flex-badge { display:inline-block; }
 
   /* FEATURE 5 — BEST DAY TO FLY */
-  .dow-chart { display:flex; align-items:flex-end; gap:clamp(2px, 1vw, 6px); height:100px; margin-top:var(--sp-sm); width:100%; }
+  .dow-chart { display:flex; align-items:flex-end; gap:clamp(2px, 1vw, 8px); height:clamp(100px, 10vw, 140px); margin-top:var(--sp-sm); width:100%; }
   .dow-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
   .dow-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; transition:height 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--bg3); }
   .dow-bar.cheapest-day { background:var(--green); box-shadow:0 0 8px rgba(62,207,142,0.3); }
   .dow-bar.pricey-day { background:var(--red); }
   .dow-bar.mid-day { background:var(--blue); opacity:0.7; }
-  .dow-label { font-size:clamp(0.5rem, 1.5vw, 0.6rem); font-family:var(--mono); color:var(--text3); text-transform:uppercase; }
-  .dow-price-label { font-size:clamp(0.5rem, 1.5vw, 0.58rem); font-family:var(--mono); color:var(--text3); }
+  .dow-label { font-size:clamp(0.5rem, 1.5vw, 0.75rem); font-family:var(--mono); color:var(--text3); text-transform:uppercase; }
+  .dow-price-label { font-size:clamp(0.5rem, 1.5vw, 0.75rem); font-family:var(--mono); color:var(--text3); }
   .dow-bar-wrap.best .dow-price-label { color:var(--green); font-weight:600; }
-  .dow-best-label { font-size:0.72rem; font-family:var(--mono); color:var(--text2); margin-top:12px; text-align:center; line-height:1.6; }
+  .dow-best-label { font-size:clamp(0.7rem, 1.5vw, 0.95rem); font-family:var(--mono); color:var(--text2); margin-top:16px; text-align:center; line-height:1.6; }
   .dow-best-label span { color:var(--green); font-weight:600; }
 
   /* FEATURE 6 — DEMAND ROW */
   .demand-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
-  .demand-panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s;}
-  .demand-inner { display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-lg); }
-  .demand-ring-wrap { position:relative; flex-shrink:0; width:88px; height:88px; }
+  .demand-panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); box-shadow:var(--shadow-card); transition:all 0.4s;}
+  .demand-inner { display:flex; flex-wrap:wrap; align-items:center; gap:clamp(16px, 2vw, 24px); }
+  .demand-ring-wrap { position:relative; flex-shrink:0; width:clamp(88px, 8vw, 110px); height:clamp(88px, 8vw, 110px); }
   .demand-ring-wrap svg { width:100%; height:100%; }
   .demand-ring-text { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
-  .demand-level { font-size:0.85rem; font-weight:700; font-family:var(--mono); line-height:1; }
-  .demand-pct-sub { font-size:0.6rem; color:var(--text3); font-family:var(--mono); }
+  .demand-level { font-size:clamp(0.85rem, 2vw, 1.1rem); font-weight:700; font-family:var(--mono); line-height:1; }
+  .demand-pct-sub { font-size:clamp(0.6rem, 1.2vw, 0.8rem); color:var(--text3); font-family:var(--mono); margin-top:2px; }
   .demand-info { flex:1 1 200px; min-width:0; }
-  .demand-title-lbl { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:6px; }
-  .demand-headline { font-size:0.95rem; font-weight:700; color:var(--text); margin-bottom:4px; }
-  .demand-sub { font-size:0.76rem; color:var(--text2); line-height:1.5; }
-  .social-proof { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); display:flex; flex-wrap:wrap; align-items:center; gap:var(--sp-lg); transition:all 0.4s; }
+  .demand-title-lbl { font-size:clamp(0.65rem, 1.2vw, 0.85rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:6px; }
+  .demand-headline { font-size:clamp(0.95rem, 2vw, 1.2rem); font-weight:700; color:var(--text); margin-bottom:6px; }
+  .demand-sub { font-size:clamp(0.75rem, 1.5vw, 0.95rem); color:var(--text2); line-height:1.5; }
+  .social-proof { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); box-shadow:var(--shadow-card); display:flex; flex-wrap:wrap; align-items:center; gap:clamp(16px, 2vw, 24px); transition:all 0.4s; }
   .social-avatars { display:flex; flex-shrink:0; }
-  .social-avatar { width:34px; height:34px; border-radius:50%; background:var(--bg3); border:2px solid var(--bg1); margin-left:-10px; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:all 0.4s; }
+  .social-avatar { width:clamp(34px, 3vw, 44px); height:clamp(34px, 3vw, 44px); border-radius:50%; background:var(--bg3); border:2px solid var(--bg1); margin-left:-10px; display:flex; align-items:center; justify-content:center; font-size:clamp(0.9rem, 2vw, 1.2rem); transition:all 0.4s; }
   .social-avatar:first-child{margin-left:0;}
-  .social-count { font-size:1.25rem; font-weight:700; font-family:var(--mono); color:var(--saffron); }
-  .social-desc { font-size:0.78rem; color:var(--text2); line-height:1.5; margin-top:4px; }
-  .price-confidence { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s;}
-  .confidence-bars { margin-top:var(--sp-sm); display:flex; flex-direction:column; gap:12px; }
+  .social-count { font-size:clamp(1.25rem, 2.5vw, 1.6rem); font-weight:700; font-family:var(--mono); color:var(--saffron); }
+  .social-desc { font-size:clamp(0.75rem, 1.5vw, 0.95rem); color:var(--text2); line-height:1.5; margin-top:6px; }
+  .price-confidence { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); box-shadow:var(--shadow-card); transition:all 0.4s;}
+  .confidence-bars { margin-top:var(--sp-sm); display:flex; flex-direction:column; gap:clamp(12px, 2vw, 16px); }
   .conf-row { display:flex; align-items:center; gap:10px; }
-  .conf-label { font-size:0.66rem; font-family:var(--mono); color:var(--text2); width:100px; flex-shrink:0; }
-  .conf-track { flex:1; height:6px; background:var(--bg3); border-radius:var(--radius-full); overflow:hidden; }
+  .conf-label { font-size:clamp(0.66rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text2); width:clamp(100px, 10vw, 140px); flex-shrink:0; }
+  .conf-track { flex:1; height:clamp(6px, 1vw, 8px); background:var(--bg3); border-radius:var(--radius-full); overflow:hidden; }
   .conf-fill { height:100%; border-radius:var(--radius-full); width:0%; transition:width 1s ease; }
-  .conf-val { font-size:0.66rem; font-family:var(--mono); color:var(--text3); width:32px; text-align:right; flex-shrink:0; }
+  .conf-val { font-size:clamp(0.66rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); width:clamp(32px, 4vw, 48px); text-align:right; flex-shrink:0; }
 
   /* NEW EXTENDED FEATURES */
-  .heatmap-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 4px); margin-top:var(--sp-sm); width: 100%; }
-  .heatmap-cell { border-radius:4px; padding:clamp(4px, 1vw, 8px) 2px; text-align:center; font-family:var(--mono); font-size:clamp(0.55rem, 1.5vw, 0.65rem); font-weight:600; color:var(--text); border:1px solid rgba(255,255,255,0.05); transition:all 0.15s; }
+  .heatmap-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 6px); margin-top:var(--sp-sm); width: 100%; }
+  .heatmap-cell { border-radius:4px; padding:clamp(4px, 1vw, 10px) 2px; text-align:center; font-family:var(--mono); font-size:clamp(0.55rem, 1.5vw, 0.8rem); font-weight:600; color:var(--text); border:1px solid rgba(255,255,255,0.05); transition:all 0.15s; }
   .heatmap-cell[onclick]:hover { transform:translateY(-2px); }
   .light-theme .heatmap-cell { border-color: rgba(0,0,0,0.05); }
   .hm-low { background: rgba(62,207,142,0.15); color:var(--green); border-color: rgba(62,207,142,0.3); }
@@ -265,22 +265,22 @@
   .hm-mid[onclick]:hover { border-color: var(--saffron); box-shadow: 0 4px 12px rgba(255,140,0,0.25); }
   .hm-high { background: rgba(240,80,96,0.15); color:var(--red); border-color: rgba(240,80,96,0.3); }
   .hm-high[onclick]:hover { border-color: var(--red); box-shadow: 0 4px 12px rgba(240,80,96,0.25); }
-  .hm-day { font-size:clamp(0.4rem, 1.2vw, 0.5rem); opacity:0.7; margin-bottom:4px; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; font-weight:400; }
+  .hm-day { font-size:clamp(0.4rem, 1.2vw, 0.6rem); opacity:0.7; margin-bottom:6px; color:var(--text3); text-transform:uppercase; letter-spacing:0.05em; font-weight:400; }
   
-  .season-bar-wrap { width:100%; height:8px; background:var(--bg3); border-radius:4px; margin-top:6px; overflow:hidden; }
-  .season-bar-fill { height:100%; border-radius:4px; transition:width 1s ease; }
-  .season-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:2px; }
-  .compare-bar { display:flex; align-items:center; height:24px; border-radius:4px; margin-top:6px; color:#000; font-family:var(--mono); font-size:0.7rem; font-weight:700; padding:0 8px; transition:width 1s ease; }
+  .season-bar-wrap { width:100%; height:clamp(8px, 1.5vw, 12px); background:var(--bg3); border-radius:var(--radius-full); margin-top:8px; overflow:hidden; }
+  .season-bar-fill { height:100%; border-radius:var(--radius-full); transition:width 1s ease; }
+  .season-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; }
+  .compare-bar { display:flex; align-items:center; height:clamp(24px, 3vw, 32px); border-radius:var(--radius-md); margin-top:8px; color:#000; font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-weight:700; padding:0 12px; transition:width 1s ease; }
 
   /* TOAST */
-  #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:0.88rem; font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
+  #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:clamp(0.88rem, 2vw, 1.1rem); font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
   #toast.show{transform:translateY(0);opacity:1;}
   #toast.ok{background:var(--green);color:#000;box-shadow:0 4px 16px rgba(62,207,142,0.35);}
 
-  /* RESPONSIVE */
+  /* RESPONSIVE EDGE CASES */
   @media(max-width:1024px){
     .features-row,.demand-row,.split-row{grid-template-columns:1fr;}
-    .metrics-row{grid-template-columns:repeat(3,1fr);}
+    .metrics-row{grid-template-columns:repeat(auto-fit, minmax(min(100%, 140px), 1fr));}
     .search-pill-wrap{height:auto;flex-wrap:wrap;border-radius:var(--radius-lg);}
     .search-segment{min-height:56px;border-radius:var(--radius-sm);flex:1 1 40%;}
     .search-segment+.search-segment::before{display:none;}
@@ -291,22 +291,38 @@
     .container{padding:var(--sp-base);}
     .header{padding:0 var(--sp-base);}
     .hero-title{font-size:clamp(1.5rem, 6vw, 2rem);}
-    .lc-step-date{font-size:0.7rem;}
+    .lc-step-date{font-size:0.82rem;}
     .share-btn span{display:none;}
     .share-btn { padding: 7px; width: 34px; height: 34px; justify-content: center; }
     .theme-btn { margin-right: 0px; }
     .header-time-pill { display: none; }
-    .lc-step-label { display: none; }
-    .lc-step { padding: 2px 8px 2px 2px; gap: 6px; }
-    .lc-step:last-child { padding: 2px 2px 2px 8px; }
+    
+    /* Optimized Mobile Lifecycle Layout */
+    .lc-track-wrap { padding: 16px 0 8px 0 !important; }
+    .lc-rail { top: 25px !important; transform: none !important; }
+    .lc-step-date { font-size: 0.68rem; line-height: 1.2; }
+    .lc-step-label { display: block; font-size: 0.55rem; margin-bottom: 2px; line-height: 1; }
+    .lc-step-text { flex-direction: column; align-items: center; gap: 0; width: 100%; }
+    .lc-step:first-child .lc-step-text { align-items: flex-start; text-align: left; }
+    .lc-step:last-child .lc-step-text { align-items: flex-end; text-align: right; }
+    .lc-step { padding: 0 !important; background: transparent !important; gap: 6px !important; flex-direction: column !important; width: 33.3%; align-items: center !important; }
+    .lc-step:first-child { align-items: flex-start !important; }
+    .lc-step:last-child { align-items: flex-end !important; flex-direction: column-reverse !important; }
+    .lc-dot-outer { width: 22px; height: 22px; margin: 0; }
+    .lc-dot-inner { width: 6px; height: 6px; }
+
     .search-segment { flex: 1 1 100%; padding: 8px var(--sp-base); } 
     .search-orb-wrap { width: 100%; justify-content: center; padding: 12px; }
     .search-orb { width: 100%; border-radius: var(--radius-sm); display:flex; gap:8px; font-family: var(--sans); font-weight: 600; font-size: 0.95rem; }
     .search-orb::after { content: 'Track Flight'; }
     #flight-path-container { height: 240px !important; }
     .savings-left { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .alert-input-row { flex-direction: column; }
+    
+    /* Optimized Mobile Price Alert Input */
+    .alert-input-row { flex-direction: column; align-items: stretch; width: 100%; }
+    .alert-input { width: 100%; }
     .alert-btn { width: 100%; }
+    
     .chart-tabs { justify-content: center; background: transparent; gap: 4px; }
     .chart-tab { background: var(--bg2); flex: 1 1 30%; }
   }
@@ -453,7 +469,7 @@
         <div id="empty-chart-msg" class="empty-overlay">
           <div class="empty-icon">✈</div>
           Enter any valid Indian domestic route above to simulate the full 330-day booking lifecycle.<br>
-          <span style="font-size:0.72rem;color:var(--text3);margin-top:8px;display:block;">Supports 70+ airports from metros to regional hubs.</span>
+          <span style="font-size:clamp(0.75rem, 1.5vw, 1rem);color:var(--text3);margin-top:12px;display:block;">Supports 70+ airports from metros to regional hubs.</span>
         </div>
         <canvas id="priceChart"></canvas>
       </div>
@@ -522,12 +538,12 @@
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title">Flex Date Finder</div>
-        <div style="font-size:0.65rem;font-family:var(--mono);color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-full);padding:3px 10px;">±3 days</div>
+        <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-full);padding:clamp(3px, 1vw, 6px) clamp(10px, 2vw, 16px);">±3 days</div>
       </div>
-      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:12px;line-height:1.5;">Tap a date to re-track. <span style="color:var(--green);font-weight:600;">BEST</span> badge marks the cheapest day in this window.</div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:12px;line-height:1.5;">Tap a date to re-track. <span style="color:var(--green);font-weight:600;">BEST</span> badge marks the cheapest day in this window.</div>
       <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px;">
         <div class="flex-grid" id="flex-grid">
-          <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to see ±3 day flex prices</div>
+          <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to see ±3 day flex prices</div>
         </div>
       </div>
     </div>
@@ -535,10 +551,10 @@
     <!-- FEATURE 5: Best Day to Fly -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Best Day to Fly</div></div>
-      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:12px;line-height:1.5;">Average fare by departure weekday for this route near your date.</div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:12px;line-height:1.5;">Average fare by departure weekday for this route near your date.</div>
       <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px;">
         <div class="dow-chart" id="dow-chart">
-          <div style="align-self:center;font-size:0.78rem;font-family:var(--mono);color:var(--text3);text-align:center;width:100%;">Track a route to see day analysis</div>
+          <div style="align-self:center;font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;width:100%;">Track a route to see day analysis</div>
         </div>
       </div>
       <div class="dow-best-label" id="dow-best-label" style="display:none;"></div>
@@ -551,7 +567,7 @@
 
     <!-- FEATURE 6a: Route Demand -->
     <div class="demand-panel">
-      <div class="panel-header" style="margin-bottom:var(--sp-base);"><div class="panel-title">Route Demand Indicator</div></div>
+      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Route Demand Indicator</div></div>
       <div class="demand-inner">
         <div class="demand-ring-wrap">
           <svg width="88" height="88" viewBox="0 0 88 88">
@@ -574,21 +590,21 @@
     <!-- FEATURE 6b: Social Proof -->
     <div class="social-proof">
       <div>
-        <div style="font-size:0.65rem;font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:10px;">Travelers Watching</div>
+        <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Travelers Watching</div>
         <div class="social-avatars" id="social-avatars"><div class="social-avatar">👤</div></div>
       </div>
       <div>
         <div class="social-count" id="social-count">—</div>
         <div class="social-desc" id="social-desc">people are currently tracking this route.</div>
-        <div style="font-size:0.72rem;color:var(--saffron);margin-top:4px;font-family:var(--mono);" id="social-urgency"></div>
+        <div style="font-size:clamp(0.72rem, 1.5vw, 0.9rem);color:var(--saffron);margin-top:6px;font-family:var(--mono);" id="social-urgency"></div>
       </div>
     </div>
 
     <!-- FEATURE 6c: Forecast Confidence -->
     <div class="price-confidence">
-      <div class="panel-header" style="margin-bottom:var(--sp-base);"><div class="panel-title">Forecast Confidence</div></div>
+      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Forecast Confidence</div></div>
       <div class="confidence-bars" id="confidence-bars">
-        <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to see confidence breakdown</div>
+        <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to see confidence breakdown</div>
       </div>
     </div>
 
@@ -600,10 +616,10 @@
     <!-- Price Heatmap Calendar -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Price Heatmap Calendar (28 Days)</div></div>
-      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:8px;line-height:1.5;">Visual calendar showing cheap vs expensive days around your departure.</div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:8px;line-height:1.5;">Visual calendar showing cheap vs expensive days around your departure.</div>
       <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px;">
         <div class="heatmap-grid" id="heatmap-grid">
-           <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to view price heatmap</div>
+           <div style="grid-column:1/-1;text-align:center;padding:36px 0;font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to view price heatmap</div>
         </div>
       </div>
     </div>
@@ -611,12 +627,12 @@
     <!-- Route Comparison -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
-      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
       <div class="alert-input-row" style="margin-bottom:16px;">
         <input class="alert-input" id="compare-dest" list="airport-list" placeholder="Alt Dest (e.g., GOI)" maxlength="3" autocomplete="off" style="flex: 1 1 100px;">
         <button class="alert-btn" onclick="compareRoute()">Compare</button>
       </div>
-      <div id="compare-result" style="display:none; background:var(--bg2); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border); transition: all 0.4s;">
+      <div id="compare-result" style="display:none; background:var(--bg2); padding:clamp(16px, 2.5vw, 24px); border-radius:var(--radius-md); border:1px solid var(--border); transition: all 0.4s;">
          <!-- Comparison results injected here -->
       </div>
     </div>
@@ -629,17 +645,17 @@
     <!-- Fare History Breakdown -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Fare History Breakdown</div></div>
-      <div style="font-size:0.75rem;color:var(--text2);margin-bottom:16px;line-height:1.5;">Average baseline price patterns for this route by season.</div>
-      <div id="season-breakdown" style="display:flex; flex-direction:column; gap:16px; opacity:0.4;">
-         <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view seasonal history</div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Average baseline price patterns for this route by season.</div>
+      <div id="season-breakdown" style="display:flex; flex-direction:column; gap:clamp(16px, 2.5vw, 24px); opacity:0.4;">
+         <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view seasonal history</div>
       </div>
     </div>
 
     <!-- Animated Flight Path -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Live Route Path</div></div>
-      <div style="width:100%; height:320px; display:flex; align-items:center; justify-content:center; position:relative; background:var(--bg2); border-radius:var(--radius-md); border:1px solid var(--border); overflow:hidden;" id="flight-path-container">
-         <div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Track a route to view flight path</div>
+      <div style="width:100%; height:clamp(240px, 30vw, 360px); display:flex; align-items:center; justify-content:center; position:relative; background:var(--bg2); border-radius:var(--radius-md); border:1px solid var(--border); overflow:hidden;" id="flight-path-container">
+         <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to view flight path</div>
       </div>
     </div>
 
@@ -1191,22 +1207,22 @@ function compareRoute() {
   res.style.display = 'block';
 
   res.innerHTML = `
-    <div style="font-size:0.75rem;font-family:var(--mono);margin-bottom:8px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;">Fares for ${fmtShort(currentData.dep)}</div>
+    <div style="font-size:clamp(0.7rem, 1.5vw, 0.8rem);font-family:var(--mono);margin-bottom:8px;color:var(--text2);text-transform:uppercase;letter-spacing:0.05em;">Fares for ${fmtShort(currentData.dep)}</div>
     <div style="margin-bottom:12px;">
-      <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600;">
+      <div style="display:flex; justify-content:space-between; font-size:clamp(0.75rem, 1.8vw, 0.9rem); font-weight:600;">
          <span>${currentData.orig} → ${currentData.dest} (Tracked)</span>
          <span>${fmt(curPrice)}</span>
       </div>
-      <div class="season-bar-wrap" style="height:12px;"><div class="compare-bar" style="width:0%; background:var(--saffron); height:100%; margin:0;" id="comp-bar-1"></div></div>
+      <div class="season-bar-wrap" style="height:clamp(10px, 1.5vw, 14px);"><div class="compare-bar" style="width:0%; background:var(--saffron); height:100%; margin:0;" id="comp-bar-1"></div></div>
     </div>
     <div>
-      <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:600;">
+      <div style="display:flex; justify-content:space-between; font-size:clamp(0.75rem, 1.8vw, 0.9rem); font-weight:600;">
          <span>${currentData.orig} → ${altDest} (Alternative)</span>
          <span>${fmt(altPrice)}</span>
       </div>
-      <div class="season-bar-wrap" style="height:12px;"><div class="compare-bar" style="width:0%; background:var(--blue); height:100%; margin:0;" id="comp-bar-2"></div></div>
+      <div class="season-bar-wrap" style="height:clamp(10px, 1.5vw, 14px);"><div class="compare-bar" style="width:0%; background:var(--blue); height:100%; margin:0;" id="comp-bar-2"></div></div>
     </div>
-    <div style="margin-top:12px; font-size:0.75rem; color:var(--text3); line-height:1.5;">
+    <div style="margin-top:12px; font-size:clamp(0.75rem, 1.5vw, 0.85rem); color:var(--text3); line-height:1.5;">
       ${curPrice < altPrice ? `Your current route is <strong>${fmt(altPrice - curPrice)} cheaper</strong> than flying to ${altDest}.` : `Switching to ${altDest} could save you <strong style="color:var(--green);">${fmt(curPrice - altPrice)}</strong> today.`}
     </div>
   `;
@@ -1229,22 +1245,22 @@ function renderSeasonality(base) {
   cont.innerHTML = `
     <div>
       <div class="season-row">
-        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Peak Season (Oct-Dec)</span>
-        <span style="font-size:0.85rem;font-weight:700;">~${fmt(peak)}</span>
+        <span style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);font-family:var(--mono);color:var(--text2);">Peak Season (Oct-Dec)</span>
+        <span style="font-size:clamp(0.85rem, 1.8vw, 1.1rem);font-weight:700;">~${fmt(peak)}</span>
       </div>
       <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--red);" id="seas-bar-1"></div></div>
     </div>
     <div>
       <div class="season-row">
-        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Shoulder Season (Feb-Apr)</span>
-        <span style="font-size:0.85rem;font-weight:700;">~${fmt(shoulder)}</span>
+        <span style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);font-family:var(--mono);color:var(--text2);">Shoulder Season (Feb-Apr)</span>
+        <span style="font-size:clamp(0.85rem, 1.8vw, 1.1rem);font-weight:700;">~${fmt(shoulder)}</span>
       </div>
       <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--blue);" id="seas-bar-2"></div></div>
     </div>
     <div>
       <div class="season-row">
-        <span style="font-size:0.75rem;font-family:var(--mono);color:var(--text2);">Off-Season (Jul-Sep)</span>
-        <span style="font-size:0.85rem;font-weight:700;">~${fmt(off)}</span>
+        <span style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);font-family:var(--mono);color:var(--text2);">Off-Season (Jul-Sep)</span>
+        <span style="font-size:clamp(0.85rem, 1.8vw, 1.1rem);font-weight:700;">~${fmt(off)}</span>
       </div>
       <div class="season-bar-wrap"><div class="season-bar-fill" style="width:0%; background:var(--green);" id="seas-bar-3"></div></div>
     </div>
@@ -1264,7 +1280,7 @@ function renderFlightPath(orig, dest) {
   const dNode = INDIAN_AIRPORTS[dest];
 
   if (!oNode || !dNode || !oNode.lat || !dNode.lat) {
-    cont.innerHTML = `<div style="font-size:0.78rem;font-family:var(--mono);color:var(--text3);">Path mapping unavailable</div>`;
+    cont.innerHTML = `<div style="font-size:clamp(0.75rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Path mapping unavailable</div>`;
     if (flightMap) { flightMap.remove(); flightMap = null; }
     return;
   }
