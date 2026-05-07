@@ -79,6 +79,25 @@
   .seg-input::placeholder { color:var(--text3); font-weight:400; text-transform:none; }
   .seg-input::-webkit-calendar-picker-indicator { filter:invert(0.6) sepia(1) hue-rotate(100deg); }
   .light-theme .seg-input::-webkit-calendar-picker-indicator { filter: none; opacity: 0.6; }
+  
+  /* Custom Autocomplete Dropdown Styles */
+  .autocomplete-dropdown {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; width: 100%; min-width: 280px;
+    background: var(--bg1); border: 1px solid var(--border2);
+    border-radius: var(--radius-md); max-height: 280px; overflow-y: auto; z-index: 1000;
+    box-shadow: var(--shadow-hover); display: none;
+  }
+  .autocomplete-dropdown.show { display: block; animation: fadeIn 0.2s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+  .ac-item {
+    padding: 12px 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover { background: var(--bg2); }
+  .ac-city { font-weight: 500; color: var(--text); font-size: 0.95rem; text-transform: capitalize; }
+  .ac-code { font-family: var(--mono); font-size: 0.75rem; color: var(--saffron); background: var(--saffron-dim); padding: 4px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; }
+
   .search-orb-wrap { display:flex; align-items:center; padding:10px 10px 10px 6px; flex:1 1 auto; justify-content:flex-end; }
   .search-orb { width:48px; height:48px; border-radius:50%; background:var(--saffron); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 2px 8px rgba(255,140,0,0.35); color:#000; }
   .search-orb:hover { transform:scale(1.07); box-shadow:0 4px 16px rgba(255,140,0,0.5); }
@@ -160,8 +179,8 @@
 
   .alert-section { margin-top:var(--sp-base); padding-top:var(--sp-base); border-top:1px solid var(--border); }
   .alert-label { font-size:clamp(0.65rem, 1.5vw, 0.9rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
-  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  .alert-input { flex:1 1 auto; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:16px; padding:0 12px; height:42px; outline:none; transition:all 0.4s; text-transform:uppercase; min-width:0; }
+  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; position: relative; }
+  .alert-input { flex:1 1 auto; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:16px; padding:0 12px; height:42px; outline:none; transition:all 0.4s; text-transform:none; min-width:0; }
   .alert-input:focus { border-color:var(--saffron); }
   .alert-btn { flex:0 0 auto; background:var(--saffron); color:#000; border:none; border-radius:var(--radius-sm); padding:0 16px; height:42px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; white-space:nowrap; text-align:center; }
   .alert-btn:hover { opacity:0.85; }
@@ -362,11 +381,13 @@
   <div class="search-pill-wrap">
     <div class="search-segment">
       <div class="seg-label">Origin</div>
-      <input class="seg-input" id="inp-origin" list="airport-list" placeholder="e.g., DEL" maxlength="3" autocomplete="off">
+      <input class="seg-input" id="inp-origin" placeholder="Search city or code..." autocomplete="off">
+      <div class="autocomplete-dropdown" id="origin-dropdown"></div>
     </div>
     <div class="search-segment">
       <div class="seg-label">Destination</div>
-      <input class="seg-input" id="inp-dest" list="airport-list" placeholder="e.g., BOM" maxlength="3" autocomplete="off">
+      <input class="seg-input" id="inp-dest" placeholder="Search city or code..." autocomplete="off">
+      <div class="autocomplete-dropdown" id="dest-dropdown"></div>
     </div>
     <div class="search-segment">
       <div class="seg-label">Departure Date</div>
@@ -377,7 +398,6 @@
         <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" stroke="var(--bg0)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>
       </button>
     </div>
-    <datalist id="airport-list"></datalist>
   </div>
 
   <div class="savings-banner" id="savings-banner">
@@ -615,8 +635,9 @@
       <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
       <div class="alert-input-row" style="margin-bottom:16px;">
-        <input class="alert-input" id="compare-dest" list="airport-list" placeholder="Alt Dest (e.g., GOI)" maxlength="3" autocomplete="off">
+        <input class="alert-input" id="compare-dest" placeholder="Alt Dest (e.g., GOI)" autocomplete="off">
         <button class="alert-btn" onclick="compareRoute()">Compare</button>
+        <div class="autocomplete-dropdown" id="compare-dropdown"></div>
       </div>
       <div id="compare-result" style="display:none; background:var(--bg2); padding:clamp(16px, 2.5vw, 24px); border-radius:var(--radius-md); border:1px solid var(--border); transition: all 0.4s;">
          <!-- Comparison results injected here -->
@@ -690,10 +711,68 @@ const INDIAN_AIRPORTS = {
   'AGX':{name:'Agatti',tier:3,lat:10.82,lon:72.19},'CNN':{name:'Kannur',tier:3,lat:11.91,lon:75.54}
 };
 
-function populateAirports(){
-  const dl=document.getElementById('airport-list');
-  const c=Object.keys(INDIAN_AIRPORTS).sort((a,b)=>INDIAN_AIRPORTS[a].tier!==INDIAN_AIRPORTS[b].tier?INDIAN_AIRPORTS[a].tier-INDIAN_AIRPORTS[b].tier:a.localeCompare(b));
-  dl.innerHTML=c.map(x=>`<option value="${x}" label="${INDIAN_AIRPORTS[x].name}"></option>`).join('');
+function setupAutocomplete(inputId, dropdownId) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+
+    input.addEventListener('input', function() {
+        renderOptions(this.value.toLowerCase(), dropdown, input);
+    });
+
+    input.addEventListener('focus', function() {
+        renderOptions(this.value.toLowerCase(), dropdown, input);
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('show');
+        }
+    });
+}
+
+function renderOptions(query, dropdown, input) {
+    dropdown.innerHTML = '';
+    let matches = [];
+    const codes = Object.keys(INDIAN_AIRPORTS);
+
+    // Search by both CODE and CITY NAME
+    for (const code of codes) {
+        const city = INDIAN_AIRPORTS[code].name;
+        if (code.toLowerCase().includes(query) || city.toLowerCase().includes(query)) {
+            matches.push({ code, city, tier: INDIAN_AIRPORTS[code].tier });
+        }
+    }
+
+    // Sort by Tier first (Metros at top), then alphabetical
+    matches.sort((a, b) => {
+       if(a.tier !== b.tier) return a.tier - b.tier;
+       return a.city.localeCompare(b.city);
+    });
+
+    if (matches.length === 0) {
+        dropdown.innerHTML = '<div style="padding:12px 16px; color:var(--text3); font-size:0.85rem; font-family:var(--mono);">No matches found</div>';
+    } else {
+        matches.forEach(m => {
+            const div = document.createElement('div');
+            div.className = 'ac-item';
+            div.innerHTML = `<span class="ac-city">${m.city}</span><span class="ac-code">${m.code}</span>`;
+            div.onclick = function() {
+                // Populate input beautifully with City (CODE)
+                input.value = `${m.city} (${m.code})`; 
+                dropdown.classList.remove('show');
+            };
+            dropdown.appendChild(div);
+        });
+    }
+    dropdown.classList.add('show');
+}
+
+// Helper to extract the 3-letter code from "New Delhi (DEL)"
+function extractCode(val) {
+    const match = val.match(/\(([A-Z]{3})\)$/i);
+    if (match) return match[1].toUpperCase();
+    return val.trim().toUpperCase().substring(0,3); // Fallback for manual typing
 }
 
 function mulberry32(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
@@ -1169,8 +1248,10 @@ function renderHeatmap(orig, dest, depStr) {
 
 function compareRoute() {
   if(!currentData){ toast("Track a primary route first."); return; }
-  const altDest = document.getElementById('compare-dest').value.trim().toUpperCase();
-  if(!altDest || !INDIAN_AIRPORTS[altDest]) { toast("Enter a valid Indian airport code."); return; }
+  const rawInput = document.getElementById('compare-dest').value;
+  const altDest = extractCode(rawInput);
+  
+  if(!altDest || !INDIAN_AIRPORTS[altDest]) { toast("Enter a valid Indian airport code or city."); return; }
   if(altDest === currentData.orig) { toast("Alternative dest cannot be the origin."); return; }
   if(altDest === currentData.dest) { toast("Alternative is same as current destination."); return; }
 
@@ -1614,14 +1695,30 @@ function updateUI(){
 }
 
 function trackFlight(){
-  const orig=document.getElementById('inp-origin').value.trim().toUpperCase();
-  const dest=document.getElementById('inp-dest').value.trim().toUpperCase();
+  const rawOrig=document.getElementById('inp-origin').value;
+  const rawDest=document.getElementById('inp-dest').value;
+  
+  // Extract the code safely if it was selected from dropdown e.g., "New Delhi (DEL)"
+  const orig=extractCode(rawOrig);
+  const dest=extractCode(rawDest);
+  
   const ds=document.getElementById('inp-date').value;
+  
   if(!orig||!dest||!ds){toast("Enter Origin, Destination, and Date.");return;}
   if(orig===dest){toast("Origin and Destination must differ.");return;}
   if(!INDIAN_AIRPORTS[orig]||!INDIAN_AIRPORTS[dest])toast("Note: One code isn't in our primary DB. Estimating.");
+  
   const data=generateLifecycle(orig,dest,ds);
-  if(data){currentData=data;renderChart();updateUI();}
+  if(data){
+    currentData=data;
+    
+    // Clean up input fields if they were typed manually with a raw code
+    if(!rawOrig.includes('(') && INDIAN_AIRPORTS[orig]) document.getElementById('inp-origin').value = `${INDIAN_AIRPORTS[orig].name} (${orig})`;
+    if(!rawDest.includes('(') && INDIAN_AIRPORTS[dest]) document.getElementById('inp-dest').value = `${INDIAN_AIRPORTS[dest].name} (${dest})`;
+    
+    renderChart();
+    updateUI();
+  }
 }
 
 function updateClock(){
@@ -1632,7 +1729,11 @@ function updateClock(){
 }
 
 window.addEventListener('load',()=>{
-  populateAirports();
+  // Setup the new custom autocomplete dropdowns
+  setupAutocomplete('inp-origin', 'origin-dropdown');
+  setupAutocomplete('inp-dest', 'dest-dropdown');
+  setupAutocomplete('compare-dest', 'compare-dropdown');
+
   const d=new Date();d.setDate(d.getDate()+60);
   document.getElementById('inp-date').value=getLocalDateString(d);
   checkTimeTheme();
