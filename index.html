@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkyTracker India — Flight Lifecycle Tracking</title>
+<title>SkyTrackerIndia — Flight Lifecycle Tracking</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -80,7 +80,6 @@
   .seg-input::-webkit-calendar-picker-indicator { filter:invert(0.6) sepia(1) hue-rotate(100deg); }
   .light-theme .seg-input::-webkit-calendar-picker-indicator { filter: none; opacity: 0.6; }
   
-  /* Custom Autocomplete Dropdown Styles */
   .autocomplete-dropdown {
     position: absolute; top: calc(100% + 4px); left: 0; right: 0; width: 100%; min-width: 280px;
     background: var(--bg1); border: 1px solid var(--border2);
@@ -351,7 +350,7 @@
 <header class="header">
   <div class="logo">
     <img src="https://i.postimg.cc/dtr4qJf8/download.png" alt="SkyTracker Logo" class="custom-logo">
-    Sky<span class="logo-accent">Tracker</span>&nbsp;India
+    <span>Sky<span class="logo-accent">Tracker</span>India</span>
   </div>
   <div class="header-right">
     <button class="theme-btn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
@@ -1619,8 +1618,8 @@ function shareDeal(){
   if(!currentData){toast("Track a route first.");return;}
   const d=currentData,cur=d.hist[d.hist.length-1];
   const oN=INDIAN_AIRPORTS[d.orig]?.name||d.orig,dN=INDIAN_AIRPORTS[d.dest]?.name||d.dest;
-  const txt=`✈ SkyTracker India\n${oN} → ${dN}\nFare: ${fmt(cur)} · ${fmtDate(d.dep)}\nTracked via SkyTracker India`;
-  if(navigator.share){navigator.share({title:'SkyTracker India',text:txt});}
+  const txt=`✈ SkyTrackerIndia\n${oN} → ${dN}\nFare: ${fmt(cur)} · ${fmtDate(d.dep)}\nTracked via SkyTrackerIndia`;
+  if(navigator.share){navigator.share({title:'SkyTrackerIndia',text:txt});}
   else{navigator.clipboard.writeText(txt).then(()=>toast('✅ Deal copied to clipboard!',true));}
 }
 
