@@ -317,12 +317,9 @@
     .search-orb::after { content: 'Track Flight'; }
     #flight-path-container { height: 240px !important; }
     .savings-left { flex-direction: column; align-items: flex-start; gap: 8px; }
-    
-    /* Optimized Mobile Price Alert Input */
     .alert-input-row { flex-direction: column; align-items: stretch; width: 100%; }
     .alert-input { width: 100%; }
     .alert-btn { width: 100%; }
-    
     .chart-tabs { justify-content: center; background: transparent; gap: 4px; }
     .chart-tab { background: var(--bg2); flex: 1 1 30%; }
   }
@@ -629,7 +626,7 @@
       <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
       <div class="alert-input-row" style="margin-bottom:16px;">
-        <input class="alert-input" id="compare-dest" list="airport-list" placeholder="Alt Dest (e.g., GOI)" maxlength="3" autocomplete="off" style="flex: 1 1 100px;">
+        <input class="alert-input" id="compare-dest" list="airport-list" placeholder="Alt Dest (e.g., GOI)" maxlength="3" autocomplete="off">
         <button class="alert-btn" onclick="compareRoute()">Compare</button>
       </div>
       <div id="compare-result" style="display:none; background:var(--bg2); padding:clamp(16px, 2.5vw, 24px); border-radius:var(--radius-md); border:1px solid var(--border); transition: all 0.4s;">
