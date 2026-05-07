@@ -41,14 +41,12 @@
 
   body { font-family: var(--sans); background: var(--bg0); color: var(--text); min-height: 100vh; line-height: 1.5; padding-bottom: 4rem; transition: background 0.4s, color 0.4s; }
 
-  /* SCROLLBAR STYLING */
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: var(--radius-full); }
   ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
   * { scrollbar-width: thin; scrollbar-color: var(--bg3) transparent; }
 
-  /* HEADER */
   .header { position:sticky; top:0; z-index:100; background:var(--bg1); border-bottom:1px solid var(--border); height:80px; display:flex; align-items:center; justify-content:space-between; padding:0 var(--sp-xl); transition: background 0.4s, border-color 0.4s; }
   .logo { display:flex; align-items:center; gap:12px; font-size:1.25rem; font-weight:700; letter-spacing:-0.03em; }
   .custom-logo { height: 32px; width: auto; object-fit: contain; border-radius: 4px; }
@@ -61,7 +59,6 @@
 
   .container { max-width:1600px; margin:0 auto; padding:clamp(16px, 3vw, 32px); }
 
-  /* HERO */
   .hero-band { padding:var(--sp-xxl) 0 var(--sp-xl); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-base); }
   .hero-title { font-size:clamp(1.75rem, 5vw, 3.5rem); font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
   .hero-title span { color:var(--saffron); }
@@ -70,7 +67,6 @@
   .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
   .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; box-shadow:0 0 6px var(--green); }
 
-  /* SEARCH PILL */
   .search-pill-wrap { background:var(--bg1); border-radius:var(--radius-full); border:1px solid var(--border2); box-shadow:var(--shadow-pill); display:flex; align-items:stretch; flex-wrap:wrap; margin-bottom:var(--sp-xxl); position:relative; z-index:20; transition:all 0.4s; }
   .search-pill-wrap:focus-within { box-shadow:var(--shadow-hover); border-color:rgba(80,180,120,0.45); }
   .search-segment { flex:1 1 200px; display:flex; flex-direction:column; justify-content:center; padding:12px var(--sp-lg); min-height:68px; position:relative; cursor:text; border-radius:var(--radius-full); transition:background 0.15s; }
@@ -89,7 +85,6 @@
   .search-orb:active { transform:scale(0.95); }
   .search-orb svg { width:20px; height:20px; }
 
-  /* FEATURE 1 — SAVINGS BANNER */
   .savings-banner { display:none; background:linear-gradient(135deg,rgba(62,207,142,0.08) 0%,rgba(255,140,0,0.06) 100%); border:1px solid rgba(62,207,142,0.22); border-radius:var(--radius-md); padding:var(--sp-base) var(--sp-xl); margin-bottom:var(--sp-xl); align-items:center; justify-content:space-between; gap:var(--sp-base); animation:slideDown 0.4s ease; }
   .savings-banner.visible { display:flex; }
   @keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
@@ -97,11 +92,10 @@
   .savings-icon { font-size:1.8rem; }
   .savings-headline { font-size:1.05rem; font-weight:700; }
   .savings-sub { font-size:0.78rem; color:var(--text2); font-family:var(--mono); margin-top:2px; }
-  .savings-right { text-align:right; }
+  .savings-right { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
   .savings-ticker { font-size:2rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; }
   .savings-ticker-label { font-size:0.62rem; font-family:var(--mono); color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
 
-  /* LIFECYCLE PROGRESS */
   .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; }
   .lifecycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(12px, 2vw, 24px); flex-wrap:wrap; gap:8px; }
   .lc-card-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
@@ -124,7 +118,6 @@
   .lc-step-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); }
   .lc-step-date { font-size:0.82rem; font-weight:600; color:var(--text); white-space:nowrap; }
 
-  /* METRICS ROW (FULLY SCALABLE) */
   .metrics-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:clamp(10px, 2vw, 24px); margin-bottom:var(--sp-xl); }
   .metric-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 2.5vw, 28px); cursor:default; transition:box-shadow 0.2s,transform 0.2s, background 0.4s, border-color 0.4s; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
   .metric-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
@@ -135,13 +128,13 @@
   .metric-value.up{color:var(--red);} .metric-value.down{color:var(--green);} .metric-value.neutral{color:var(--text);}
   .metric-sub { font-size:0.7rem; color:var(--text3); font-family:var(--mono); line-height:1.4; word-break:break-word; }
 
-  /* CONTENT GRID */
   .content-grid { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-bottom:var(--sp-xl); width: 100%; }
   .content-grid > .panel:first-child { flex: 999 1 min(100%, 550px); min-width:0; }
   .content-grid > .panel:last-child { flex: 1 1 min(100%, 360px); min-width:0; }
   .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; }
   .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(16px, 2vw, 24px); flex-wrap:wrap; gap:12px; }
   .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); }
+  
   .chart-tabs { display:flex; flex-wrap:wrap; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-md); padding:4px; width: 100%; max-width: max-content; }
   .chart-tab { padding:clamp(5px, 1vw, 8px) clamp(10px, 2vw, 16px); border-radius:var(--radius-full); font-size:clamp(0.65rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; flex:1 1 auto; text-align:center; }
   .chart-tab.active { background:var(--bg3); color:var(--saffron); }
@@ -152,18 +145,19 @@
   .chart-legend { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-top:var(--sp-base); font-size:clamp(0.7rem, 1.2vw, 0.9rem); font-family:var(--mono); color:var(--text3); justify-content:center; }
   .legend-item { display:flex; align-items:center; gap:8px; }
   .legend-line { width:20px; height:2px; border-radius:2px; }
+  
   .recommendation-box { border-radius:var(--radius-md); padding:clamp(16px, 2vw, 24px); margin-bottom:var(--sp-base); border:1px solid; transition:all 0.3s; }
   .rec-buy{background:var(--green-dim);border-color:rgba(62,207,142,0.3);} .rec-wait{background:var(--saffron-dim);border-color:rgba(255,140,0,0.3);} .rec-caution{background:var(--red-dim);border-color:rgba(240,80,96,0.3);}
   .rec-action { font-size:clamp(1rem, 2vw, 1.3rem); font-weight:700; margin-bottom:8px; }
   .rec-buy .rec-action{color:var(--green);} .rec-wait .rec-action{color:var(--saffron);} .rec-caution .rec-action{color:var(--red);}
   .rec-detail { font-size:clamp(0.8rem, 1.5vw, 1rem); color:var(--text2); line-height:1.65; }
+  
   .stat-row { display:flex; justify-content:space-between; align-items:center; padding:clamp(12px, 1.5vw, 16px) 0; border-bottom:1px solid var(--border); }
   .stat-row:last-child{border-bottom:none;}
   .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); text-transform:uppercase; letter-spacing:0.06em; }
   .stat-row-value { font-weight:600; font-family:var(--mono); font-size:clamp(0.85rem, 1.8vw, 1.1rem); color:var(--text); }
   .route-badge { display:inline-flex; align-items:center; padding:2px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.6rem; color:var(--saffron); margin-left:8px; }
 
-  /* FEATURE 2 — PRICE ALERT */
   .alert-section { margin-top:var(--sp-base); padding-top:var(--sp-base); border-top:1px solid var(--border); }
   .alert-label { font-size:clamp(0.65rem, 1.5vw, 0.9rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
   .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
@@ -180,11 +174,9 @@
   .alert-match-btn:hover { border-color:var(--saffron); transform:translateY(-1px); box-shadow:var(--shadow-pill); }
   .alert-match-btn strong { color:var(--green); margin-left:4px; }
 
-  /* FEATURES ROW */
   .features-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
   .split-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
 
-  /* FEATURE 3 — BOOKING SCORE GAUGE */
   .score-wrap { display:flex; flex-direction:column; align-items:center; padding:var(--sp-base) 0; flex-grow:1; width:100%; }
   .gauge-svg-wrap { position:relative; width:100%; max-width:180px; aspect-ratio:180/110; height:auto; margin:0 auto; }
   .gauge-svg-wrap svg { width:100%; height:100%; overflow:visible; }
@@ -199,7 +191,6 @@
   .score-grade.none{background:var(--bg2);color:var(--text3);border-color:var(--border);}
   .score-desc { font-size:clamp(0.75rem, 1.8vw, 0.95rem); color:var(--text2); text-align:center; margin-top:12px; line-height:1.6; flex-grow:1; }
 
-  /* FEATURE 4 — FLEX DATE FINDER */
   .flex-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 5px); margin-top:var(--sp-sm); width:100%; }
   .flex-cell { border-radius:var(--radius-sm); padding:clamp(4px, 1vw, 8px) 2px; text-align:center; cursor:pointer; transition:all 0.15s; border:1px solid var(--border); background:var(--bg2); }
   .flex-cell:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-hover); }
@@ -214,7 +205,6 @@
   .flex-badge { font-size:clamp(0.5rem, 1vw, 0.65rem); background:var(--green); color:#000; border-radius:var(--radius-full); padding:1px 6px; margin-top:4px; display:none; font-weight:700; }
   .flex-cell.cheapest .flex-badge { display:inline-block; }
 
-  /* FEATURE 5 — BEST DAY TO FLY */
   .dow-chart { display:flex; align-items:flex-end; gap:clamp(2px, 1vw, 8px); height:clamp(100px, 10vw, 140px); margin-top:var(--sp-sm); width:100%; }
   .dow-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
   .dow-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; transition:height 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--bg3); }
@@ -227,7 +217,6 @@
   .dow-best-label { font-size:clamp(0.7rem, 1.5vw, 0.95rem); font-family:var(--mono); color:var(--text2); margin-top:16px; text-align:center; line-height:1.6; }
   .dow-best-label span { color:var(--green); font-weight:600; }
 
-  /* FEATURE 6 — DEMAND ROW */
   .demand-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
   .demand-panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); box-shadow:var(--shadow-card); transition:all 0.4s;}
   .demand-inner { display:flex; flex-wrap:wrap; align-items:center; gap:clamp(16px, 2vw, 24px); }
@@ -254,7 +243,6 @@
   .conf-fill { height:100%; border-radius:var(--radius-full); width:0%; transition:width 1s ease; }
   .conf-val { font-size:clamp(0.66rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); width:clamp(32px, 4vw, 48px); text-align:right; flex-shrink:0; }
 
-  /* NEW EXTENDED FEATURES */
   .heatmap-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 6px); margin-top:var(--sp-sm); width: 100%; }
   .heatmap-cell { border-radius:4px; padding:clamp(4px, 1vw, 10px) 2px; text-align:center; font-family:var(--mono); font-size:clamp(0.55rem, 1.5vw, 0.8rem); font-weight:600; color:var(--text); border:1px solid rgba(255,255,255,0.05); transition:all 0.15s; }
   .heatmap-cell[onclick]:hover { transform:translateY(-2px); }
@@ -272,12 +260,20 @@
   .season-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; }
   .compare-bar { display:flex; align-items:center; height:clamp(24px, 3vw, 32px); border-radius:var(--radius-md); margin-top:8px; color:#000; font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-weight:700; padding:0 12px; transition:width 1s ease; }
 
-  /* TOAST */
   #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:clamp(0.88rem, 2vw, 1.1rem); font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
   #toast.show{transform:translateY(0);opacity:1;}
   #toast.ok{background:var(--green);color:#000;box-shadow:0 4px 16px rgba(62,207,142,0.35);}
 
-  /* RESPONSIVE EDGE CASES */
+  .book-now-wrap { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; animation: fadeUp 0.4s ease both; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  .btn-book-primary { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 8px; background: var(--saffron); color: #000; border: none; border-radius: var(--radius-full); padding: 14px 22px; font-size: 0.95rem; font-weight: 700; font-family: var(--sans); text-align: center; text-decoration: none; cursor: pointer; box-shadow: 0 4px 18px rgba(255,140,0,0.38); transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s; white-space: nowrap; }
+  .btn-book-primary:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 6px 24px rgba(255,140,0,0.52); }
+  .btn-book-primary:active { transform: scale(0.97); }
+
+  .btn-book-small { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--green); color: #000; border: none; border-radius: var(--radius-full); padding: 8px 16px; font-size: 0.8rem; font-weight: 700; font-family: var(--sans); text-decoration: none; cursor: pointer; box-shadow: 0 2px 8px rgba(62,207,142,0.3); transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s; margin-top: 8px; white-space: nowrap; }
+  .btn-book-small:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(62,207,142,0.4); }
+  .btn-book-small:active { transform: scale(0.95); }
+
   @media(max-width:1024px){
     .features-row,.demand-row,.split-row{grid-template-columns:1fr;}
     .metrics-row{grid-template-columns:repeat(auto-fit, minmax(min(100%, 140px), 1fr));}
@@ -286,6 +282,7 @@
     .search-segment+.search-segment::before{display:none;}
     .search-orb-wrap{padding:10px 12px;margin-left:auto; width: 100%; justify-content: flex-end;}
     .savings-banner{flex-direction:column;align-items:flex-start;}
+    .savings-right{align-items:flex-start; text-align:left; margin-top:12px; width:100%;}
   }
   @media(max-width:640px){
     .container{padding:var(--sp-base);}
@@ -297,7 +294,6 @@
     .theme-btn { margin-right: 0px; }
     .header-time-pill { display: none; }
     
-    /* Optimized Mobile Lifecycle Layout */
     .lc-track-wrap { padding: 16px 0 8px 0 !important; }
     .lc-rail { top: 25px !important; transform: none !important; }
     .lc-step-date { font-size: 0.68rem; line-height: 1.2; }
@@ -322,6 +318,8 @@
     .alert-btn { width: 100%; }
     .chart-tabs { justify-content: center; background: transparent; gap: 4px; }
     .chart-tab { background: var(--bg2); flex: 1 1 30%; }
+    .book-now-wrap { flex-direction: column; }
+    .btn-book-primary { flex: 1 1 100%; }
   }
   @media(max-width:380px) {
     .logo { font-size: 1.1rem; }
@@ -382,7 +380,6 @@
     <datalist id="airport-list"></datalist>
   </div>
 
-  <!-- FEATURE 1: Savings vs Departure Banner -->
   <div class="savings-banner" id="savings-banner">
     <div class="savings-left">
       <div class="savings-icon">💰</div>
@@ -394,6 +391,7 @@
     <div class="savings-right">
       <div class="savings-ticker" id="savings-ticker">₹—</div>
       <div class="savings-ticker-label">Potential Savings Today</div>
+      <div id="small-book-injection"></div>
     </div>
   </div>
 
@@ -488,7 +486,9 @@
         <div class="stat-row"><span class="stat-row-label">vs. Initial</span><span class="stat-row-value" id="stat-vs-init">—</span></div>
         <div class="stat-row"><span class="stat-row-label">7-Day Trend</span><span class="stat-row-value" id="stat-trend">—</span></div>
 
-        <!-- FEATURE 2: Price Alert -->
+        <!-- Book Now Button Container Injection Point -->
+        <div id="book-now-injection-point"></div>
+
         <div class="alert-section">
           <div class="alert-label">🔔 Price Alert — Set Target Fare</div>
           <div class="alert-input-row">
@@ -501,10 +501,8 @@
     </div>
   </div>
 
-  <!-- FEATURES ROW -->
   <div class="features-row">
 
-    <!-- FEATURE 3: Smart Booking Score -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Smart Booking Score</div></div>
       <div class="score-wrap" id="score-wrap">
@@ -531,7 +529,6 @@
       </div>
     </div>
 
-    <!-- FEATURE 4: Flex Date Finder -->
     <div class="panel">
       <div class="panel-header">
         <div class="panel-title">Flex Date Finder</div>
@@ -545,7 +542,6 @@
       </div>
     </div>
 
-    <!-- FEATURE 5: Best Day to Fly -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Best Day to Fly</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:12px;line-height:1.5;">Average fare by departure weekday for this route near your date.</div>
@@ -559,10 +555,8 @@
 
   </div>
 
-  <!-- DEMAND ROW -->
   <div class="demand-row">
 
-    <!-- FEATURE 6a: Route Demand -->
     <div class="demand-panel">
       <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Route Demand Indicator</div></div>
       <div class="demand-inner">
@@ -584,7 +578,6 @@
       </div>
     </div>
 
-    <!-- FEATURE 6b: Social Proof -->
     <div class="social-proof">
       <div>
         <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Travelers Watching</div>
@@ -597,7 +590,6 @@
       </div>
     </div>
 
-    <!-- FEATURE 6c: Forecast Confidence -->
     <div class="price-confidence">
       <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Forecast Confidence</div></div>
       <div class="confidence-bars" id="confidence-bars">
@@ -607,10 +599,8 @@
 
   </div>
 
-  <!-- EXTENDED FEATURES ROW 1 -->
   <div class="split-row">
     
-    <!-- Price Heatmap Calendar -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Price Heatmap Calendar (28 Days)</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:8px;line-height:1.5;">Visual calendar showing cheap vs expensive days around your departure.</div>
@@ -621,7 +611,6 @@
       </div>
     </div>
 
-    <!-- Route Comparison -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
@@ -636,10 +625,8 @@
 
   </div>
 
-  <!-- EXTENDED FEATURES ROW 2 -->
   <div class="split-row">
     
-    <!-- Fare History Breakdown -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Fare History Breakdown</div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Average baseline price patterns for this route by season.</div>
@@ -648,7 +635,6 @@
       </div>
     </div>
 
-    <!-- Animated Flight Path -->
     <div class="panel">
       <div class="panel-header"><div class="panel-title">Live Route Path</div></div>
       <div style="width:100%; height:clamp(240px, 30vw, 360px); display:flex; align-items:center; justify-content:center; position:relative; background:var(--bg2); border-radius:var(--radius-md); border:1px solid var(--border); overflow:hidden;" id="flight-path-container">
@@ -656,6 +642,22 @@
       </div>
     </div>
 
+  </div>
+
+  <div class="features-row">
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div class="panel-header"><div class="panel-title">Connecting Flights (1 Stop)</div></div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Alternative 1-stop routes to your destination through major Indian hubs.</div>
+      <div id="connecting-flights-container" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view connecting flights</div>
+      </div>
+
+      <div class="panel-header" style="margin-top: clamp(24px, 4vw, 40px); border-top: 1px solid var(--border); padding-top: clamp(16px, 3vw, 24px);"><div class="panel-title">Layover Hacks (Hidden City)</div></div>
+      <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Find flights to a different final destination that have a layover in <strong>your actual destination</strong>. You exit the airport during the layover.</div>
+      <div id="hidden-city-container" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view layover hacks</div>
+      </div>
+    </div>
   </div>
 
 </main>
@@ -709,11 +711,9 @@ let currentAlertTarget = 0;
 let currentAlertTodayMatch = false;
 let currentAlertTodayFare = 0;
 
-// THEME LOGIC
 function checkTimeTheme() {
   if (manualThemeOverride) return;
   const hour = new Date().getHours();
-  // Light mode between 6 AM and 6 PM
   const shouldBeLight = hour >= 6 && hour < 18;
   if (isLightMode !== shouldBeLight) {
     setTheme(shouldBeLight);
@@ -797,6 +797,8 @@ function generateLifecycle(orig,dest,depDateStr){
   const today=new Date();today.setHours(0,0,0,0);
   const dep=new Date(depDateStr);dep.setHours(0,0,0,0);
   const dtd=gap(today,dep);
+  
+  if(isNaN(dtd)){toast("Please enter a valid departure date.");return null;}
   if(dtd<0){toast("Flight already departed. Choose a future date.");return null;}
   if(dtd>330){toast("Flights aren't listed more than 330 days ahead.");return null;}
 
@@ -825,7 +827,6 @@ function generateLifecycle(orig,dest,depDateStr){
   return{orig,dest,base,listed,today,dep,dtd,tracked:330-dtd,hist,fore:[hist[hist.length-1],...fore],labels,dates};
 }
 
-// CHART
 function initChart(){
   priceChart=new Chart(document.getElementById('priceChart').getContext('2d'),{
     type:'line',data:{labels:[],datasets:[]},
@@ -873,7 +874,6 @@ function setZoom(mode,btn){
   btn.classList.add('active');renderChart();
 }
 
-// FEATURE 1: Savings Banner
 function renderSavingsBanner(cur,pred){
   const banner=document.getElementById('savings-banner');
   banner.classList.add('visible');
@@ -894,7 +894,6 @@ function renderSavingsBanner(cur,pred){
   }
 }
 
-// FEATURE 2: Price Alert
 function checkPriceAlert(){
   if(!currentData){toast("Track a route first.");return;}
   const v=parseInt(document.getElementById('alert-price-input').value);
@@ -903,7 +902,6 @@ function checkPriceAlert(){
   const cur=d.hist[d.hist.length-1];
   const res=document.getElementById('alert-result');
   
-  // Scan for ALL dates in the next 330 days matching the target fare
   const today = new Date(); today.setHours(0,0,0,0);
   currentAlertMatches = [];
   let absoluteMin = Infinity;
@@ -929,15 +927,12 @@ function checkPriceAlert(){
   res.style.display='block';
 
   if(v < absoluteMin * 0.75) {
-    // Target is unrealistically Low
     res.className='alert-result visible miss';
     res.innerHTML=`🚫 <strong>No tickets found.</strong> Target fare (${fmt(v)}) is unrealistically low for this route. The absolute cheapest fare in the next 330 days is <strong>${fmt(absoluteMin)}</strong> on ${fmtShort(minDateObj)}.`;
   } else if(currentAlertMatches.length > 0){
-    // Target achievable on one or more dates
     res.className='alert-result visible hit';
-    renderAlertMatches('date-asc'); // Default sort
+    renderAlertMatches('date-asc');
   } else {
-    // Target is possible historically, but unreachable in the current schedule
     res.className='alert-result visible miss';
     res.innerHTML=`⏳ Target is currently unreachable. The lowest predicted fare anywhere in the next 330 days is <strong>${fmt(absoluteMin)}</strong> on ${fmtShort(minDateObj)}. Try raising your target.`;
   }
@@ -945,8 +940,6 @@ function checkPriceAlert(){
 
 function renderAlertMatches(sortMode) {
   const res = document.getElementById('alert-result');
-  
-  // Sort array based on selection
   currentAlertMatches.sort((a, b) => {
      if(sortMode === 'price-asc') return a.price - b.price || a.date - b.date;
      if(sortMode === 'price-desc') return b.price - a.price || a.date - b.date;
@@ -962,7 +955,6 @@ function renderAlertMatches(sortMode) {
   
   html += `💡 <strong>Target fare (${fmt(currentAlertTarget)} or lower) available on ${currentAlertMatches.length} date(s):</strong><br>`;
   
-  // Controls
   html += `
     <div class="alert-controls">
        <span>Tap a date to re-track:</span>
@@ -975,7 +967,6 @@ function renderAlertMatches(sortMode) {
     </div>
   `;
 
-  // Clickable Tags
   const dateStrList = currentAlertMatches.map(m => 
     `<span class="alert-match-btn" onclick="jumpDate('${m.ds}')">${fmtShort(m.date)} <strong>${fmt(m.price)}</strong></span>`
   ).join('');
@@ -984,7 +975,6 @@ function renderAlertMatches(sortMode) {
   res.innerHTML = html;
 }
 
-// FEATURE 3: Booking Score
 function renderScore(cur,low,pred,dtd){
   const range=pred-low;
   const pos=range>0?Math.max(0,Math.min(1,(pred-cur)/range)):0;
@@ -1014,7 +1004,6 @@ function renderScore(cur,low,pred,dtd){
   document.getElementById('score-desc').textContent=desc;
 }
 
-// FEATURE 4: Flex Date Finder
 function renderFlexDates(orig,dest,depStr,dtd){
   const dep=new Date(depStr);dep.setHours(0,0,0,0);
   const today=new Date();today.setHours(0,0,0,0);
@@ -1049,7 +1038,6 @@ function jumpDate(ds){
   toast('Re-tracked: '+new Date(ds).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),true);
 }
 
-// FEATURE 5: Best Day to Fly
 function renderBestDay(orig,dest,depStr){
   const dep=new Date(depStr);dep.setHours(0,0,0,0);
   const today=new Date();today.setHours(0,0,0,0);
@@ -1058,7 +1046,7 @@ function renderBestDay(orig,dest,depStr){
 
   for(let dow=0;dow<7;dow++){
     const d=new Date(dep);
-    const jsDow=(dow+1)%7;// Mon=1..Sun=0
+    const jsDow=(dow+1)%7;
     let diff=(jsDow-d.getDay()+7)%7;
     if(diff===0)diff=7;
     d.setDate(d.getDate()+diff);
@@ -1085,7 +1073,6 @@ function renderBestDay(orig,dest,depStr){
   bl.innerHTML=`Cheapest: <span>${prices[minI].long}</span> (${fmt(minP)}) · Save ${fmt(maxP-minP)} vs ${prices[maxI].long}`;
 }
 
-// FEATURE 6: Demand + Social + Confidence
 function renderDemand(orig,dest,dtd){
   const t1=INDIAN_AIRPORTS[orig]?.tier||3,t2=INDIAN_AIRPORTS[dest]?.tier||3;
   const tierScore=(6-t1)+(6-t2);
@@ -1110,14 +1097,12 @@ function renderDemand(orig,dest,dtd){
   document.getElementById('demand-headline').textContent=lv.h;
   document.getElementById('demand-sub').textContent=lv.s;
 
-  // Social
   const watch=Math.floor(40+pct*9+(330-dtd)*0.4);
   document.getElementById('social-count').textContent=watch.toLocaleString('en-IN')+' travelers';
   document.getElementById('social-urgency').textContent=pct>70?`Price changed ${Math.floor(Math.random()*3+2)}× in last 24h.`:pct>40?'Price changes expected soon.':'Fares relatively stable now.';
   const em=['👨','👩','🧑','👦','👧'];
   document.getElementById('social-avatars').innerHTML=em.slice(0,Math.min(5,Math.ceil(pct/20))).map(e=>`<div class="social-avatar">${e}</div>`).join('');
 
-  // Confidence
   const hc=t1===1&&t2===1?94:t1+t2<=4?87:79;
   const sc=83;
   const tc=dtd>100?91:dtd>40?84:dtd>14?73:63;
@@ -1137,7 +1122,6 @@ function renderDemand(orig,dest,dtd){
   setTimeout(()=>document.querySelectorAll('.conf-fill').forEach(e=>e.style.width=e.dataset.w+'%'),120);
 }
 
-// EXTENDED FEATURE 1: Price Heatmap Calendar
 function renderHeatmap(orig, dest, depStr) {
   const dep = new Date(depStr); dep.setHours(0,0,0,0);
   const today = new Date(); today.setHours(0,0,0,0);
@@ -1145,14 +1129,12 @@ function renderHeatmap(orig, dest, depStr) {
   let cells = [];
   let minP = Infinity, maxP = 0;
 
-  // 28 day window
   for(let off = -14; off <= 13; off++) {
     const d = new Date(dep); d.setDate(d.getDate() + off);
     const dbd = Math.max(0, gap(today, d));
-    const ds = getLocalDateString(d); // Capture formatted date string
+    const ds = getLocalDateString(d); 
     
     if(dbd < 0) {
-       // Just put historical or generic filler for past dates so grid stays complete
        cells.push({d, p: null, past: true, ds});
        continue;
     }
@@ -1185,7 +1167,6 @@ function renderHeatmap(orig, dest, depStr) {
   }).join('');
 }
 
-// EXTENDED FEATURE 2: Route Comparison
 function compareRoute() {
   if(!currentData){ toast("Track a primary route first."); return; }
   const altDest = document.getElementById('compare-dest').value.trim().toUpperCase();
@@ -1230,7 +1211,6 @@ function compareRoute() {
   }, 50);
 }
 
-// EXTENDED FEATURE 3: Fare History Breakdown
 function renderSeasonality(base) {
   const peak = Math.round((base * 1.35)/10)*10;
   const shoulder = Math.round(base/10)*10;
@@ -1270,7 +1250,6 @@ function renderSeasonality(base) {
   }, 50);
 }
 
-// EXTENDED FEATURE 4: Animated Flight Path
 function renderFlightPath(orig, dest) {
   const cont = document.getElementById('flight-path-container');
   const oNode = INDIAN_AIRPORTS[orig];
@@ -1282,7 +1261,6 @@ function renderFlightPath(orig, dest) {
     return;
   }
 
-  // Initialize the precise geographical map background exactly once
   if (!flightMap) {
     cont.innerHTML = `
       <div id="leaflet-map" style="position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; background:transparent;"></div>
@@ -1290,32 +1268,28 @@ function renderFlightPath(orig, dest) {
     `;
     
     flightMap = L.map('leaflet-map', {
-      zoomControl: true, // Enabled Zoom Controls
-      dragging: true,    // Enabled Panning
-      scrollWheelZoom: true, // Enabled Scroll Zoom
+      zoomControl: true, 
+      dragging: true,    
+      scrollWheelZoom: true, 
       doubleClickZoom: true,
       boxZoom: true,
       keyboard: false,
       attributionControl: false
     });
     
-    // Apply matching map theme layer
     updateMapTheme();
   }
 
-  // Clear previous event listeners to prevent duplicate overlay drawing on new searches
   flightMap.off('move');
   flightMap.off('zoom');
 
   flightMap.invalidateSize();
-  // Geographically bound to perfectly frame India
   flightMap.fitBounds([[7.0, 67.0], [36.0, 98.0]]);
 
   const drawOverlay = () => {
      const svgOverlay = document.getElementById('flight-svg-overlay');
      if(!svgOverlay) return;
 
-     // Fetch exact pixel coordinates relative to the container using Leaflet Projection
      const p1 = flightMap.latLngToContainerPoint([oNode.lat, oNode.lon]);
      const p2 = flightMap.latLngToContainerPoint([dNode.lat, dNode.lon]);
 
@@ -1326,7 +1300,6 @@ function renderFlightPath(orig, dest) {
      const cx = (p1.x + p2.x)/2 - dy * arcFactor;
      const cy = (p1.y + p2.y)/2 + dx * arcFactor;
 
-     // Inject the dynamic overlay synced with real map pixel locations
      svgOverlay.innerHTML = `
        <defs>
          <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -1339,34 +1312,228 @@ function renderFlightPath(orig, dest) {
          </filter>
        </defs>
        
-       <!-- Flight Arc Curve -->
        <path id="flight-arc" d="M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}" fill="none" stroke="url(#pathGrad)" stroke-width="1.5" stroke-dasharray="3,3"/>
        
-       <!-- Animated Plane -->
        <g>
           <path d="M 4 0 L -3 -3 L -1 0 L -3 3 Z" fill="#ff8c00" filter="url(#glow)"/>
           <animateMotion dur="${Math.max(1.5, dist/50)}s" repeatCount="indefinite" path="M ${p1.x} ${p1.y} Q ${cx} ${cy} ${p2.x} ${p2.y}" rotate="auto"/>
        </g>
        
-       <!-- Origin Marker -->
        <circle cx="${p1.x}" cy="${p1.y}" r="3" fill="var(--bg2)" stroke="var(--blue)" stroke-width="2"/>
        <text x="${p1.x}" y="${p1.y - 8}" fill="var(--text)" font-size="10" font-weight="600" font-family="var(--mono)" text-anchor="middle" style="text-shadow: 0 1px 3px var(--bg1), 0 -1px 3px var(--bg1), 1px 0 3px var(--bg1), -1px 0 3px var(--bg1);">${orig}</text>
        
-       <!-- Destination Marker -->
        <circle cx="${p2.x}" cy="${p2.y}" r="3" fill="var(--saffron)" stroke="var(--bg2)" stroke-width="2" filter="url(#glow)"/>
        <text x="${p2.x}" y="${p2.y - 8}" fill="var(--text)" font-size="10" font-weight="600" font-family="var(--mono)" text-anchor="middle" style="text-shadow: 0 1px 3px var(--bg1), 0 -1px 3px var(--bg1), 1px 0 3px var(--bg1), -1px 0 3px var(--bg1);">${dest}</text>
      `;
   };
 
-  // Run the overlay draw after a slight delay to allow the geographical tiles to stabilize bounds
   setTimeout(drawOverlay, 50);
 
-  // Sync overlay drawing when map pans or zooms
   flightMap.on('move', drawOverlay);
   flightMap.on('zoom', drawOverlay);
 }
 
-// SHARE
+function renderConnectingFlights(orig, dest, depStr, dbd) {
+  const cont = document.getElementById('connecting-flights-container');
+  const hubs = ['DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'CCU', 'AMD', 'PNQ', 'GOI', 'COK'].filter(h => h !== orig && h !== dest);
+  
+  let seed = 0;
+  const ss = orig + dest + depStr;
+  for(let i=0; i<ss.length; i++) seed += ss.charCodeAt(i)*(i+1);
+  const rand = mulberry32(seed * 456);
+
+  if (hubs.length === 0) {
+      cont.innerHTML = `<div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">No connecting flight exist.</div>`;
+      return;
+  }
+
+  const flights = hubs.map(hub => {
+      const p1 = priceAt(orig, hub, depStr, dbd);
+      const p2 = priceAt(hub, dest, depStr, dbd);
+      
+      const discount = Math.floor(rand() * 800) + 200; 
+      const total = Math.max(1500, p1 + p2 - discount); 
+      
+      return { hub, p1, p2, total };
+  });
+
+  flights.sort((a, b) => a.total - b.total);
+
+  cont.innerHTML = flights.map((flight, index) => {
+      const hubName = INDIAN_AIRPORTS[flight.hub]?.name || flight.hub;
+      const isLowest = index === 0;
+      
+      return `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg2); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--border); transition:all 0.3s;" onmouseover="this.style.borderColor='var(--saffron)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="display:flex; flex-direction:column; gap:4px;">
+              <div style="font-size:clamp(0.85rem, 1.8vw, 1.1rem); font-weight:600; color:var(--text); font-family:var(--mono);">
+                  ${orig} <span style="color:var(--text3);">→</span> ${flight.hub} <span style="color:var(--text3);">→</span> ${dest}
+                  ${isLowest ? `<span style="font-size:0.55rem; background:var(--green); color:#000; padding:2px 6px; border-radius:var(--radius-full); margin-left:8px; vertical-align:middle; font-weight:700;">LOWEST FARE</span>` : ''}
+              </div>
+              <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem); color:var(--text2);">
+                  1 Stop · Layover in <strong style="color:var(--text);">${hubName}</strong>
+              </div>
+              <div style="font-size:clamp(0.6rem, 1vw, 0.75rem); color:var(--text3); font-family:var(--mono); margin-top:2px;">
+                  Leg 1 (${orig}-${flight.hub}): ${fmt(flight.p1)} &nbsp;|&nbsp; Leg 2 (${flight.hub}-${dest}): ${fmt(flight.p2)}
+              </div>
+          </div>
+          <div style="text-align:right;">
+              <div style="font-size:clamp(1rem, 2vw, 1.3rem); font-weight:700; font-family:var(--mono); color:${isLowest ? 'var(--green)' : 'var(--saffron)'};">${fmt(flight.total)}</div>
+              <div style="font-size:clamp(0.6rem, 1vw, 0.75rem); color:var(--text3); font-family:var(--mono); margin-top:2px;">TOTAL FARE</div>
+          </div>
+      </div>
+      `;
+  }).join('');
+}
+
+function renderHiddenCity(orig, dest, depStr, dbd) {
+  const cont = document.getElementById('hidden-city-container');
+  const pDirect = priceAt(orig, dest, depStr, dbd);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const depDate = new Date(depStr);
+
+  let hacks = [];
+
+  for (const C in INDIAN_AIRPORTS) {
+      if (C === orig || C === dest) continue;
+      let seed = 0; const ss = orig + dest + C;
+      for(let i=0; i<ss.length; i++) seed += ss.charCodeAt(i)*(i+1);
+      const rand = mulberry32(seed * 789);
+
+      if (rand() < 0.10) {
+          const pHidden = priceAt(orig, C, depStr, dbd);
+          if (pHidden < pDirect - 200) {
+              hacks.push({ C, price: pHidden, dateStr: depStr, dateObj: depDate, savings: pDirect - pHidden });
+          }
+      }
+  }
+
+  if (hacks.length > 0) {
+      hacks.sort((a,b) => a.price - b.price);
+      cont.innerHTML = hacks.map(hack => `
+          <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg2); padding:12px 16px; border-radius:var(--radius-md); border:1px solid var(--border); transition:all 0.3s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--border)'">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:clamp(0.85rem, 1.8vw, 1.1rem); font-weight:600; color:var(--text); font-family:var(--mono);">
+                    ${orig} <span style="color:var(--text3);">→</span> ${dest} <span style="color:var(--text3);">→</span> ${hack.C}
+                </div>
+                <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem); color:var(--text2);">
+                    Book to <strong style="color:var(--text);">${INDIAN_AIRPORTS[hack.C]?.name || hack.C}</strong>, exit airport at layover in <strong style="color:var(--saffron);">${INDIAN_AIRPORTS[dest]?.name || dest}</strong>
+                </div>
+                <div style="font-size:clamp(0.6rem, 1vw, 0.75rem); color:var(--green); font-family:var(--mono); margin-top:2px; font-weight:600;">
+                    SAVES ${fmt(hack.savings)} vs direct flight
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-size:clamp(1rem, 2vw, 1.3rem); font-weight:700; font-family:var(--mono); color:var(--green);">${fmt(hack.price)}</div>
+                <div style="font-size:clamp(0.6rem, 1vw, 0.75rem); color:var(--text3); font-family:var(--mono); margin-top:2px;">HACK FARE</div>
+            </div>
+        </div>
+      `).join('');
+      return;
+  }
+
+  let altHacks = [];
+  for (let off = -5; off <= 5; off++) {
+      if (off === 0) continue;
+      const altDate = new Date(depDate);
+      altDate.setDate(altDate.getDate() + off);
+      const altDbd = Math.max(0, gap(today, altDate));
+      if (altDbd <= 0) continue;
+      const altDs = getLocalDateString(altDate);
+
+      for (const C in INDIAN_AIRPORTS) {
+          if (C === orig || C === dest) continue;
+          let seed = 0; const ss = orig + dest + C;
+          for(let i=0; i<ss.length; i++) seed += ss.charCodeAt(i)*(i+1);
+          const rand = mulberry32(seed * 789);
+
+          if (rand() < 0.10) {
+              const pHiddenAlt = priceAt(orig, C, altDs, altDbd);
+              if (pHiddenAlt < pDirect - 200) {
+                  altHacks.push({ C, price: pHiddenAlt, dateStr: altDs, dateObj: altDate, savings: pDirect - pHiddenAlt });
+              }
+          }
+      }
+  }
+
+  if (altHacks.length > 0) {
+      altHacks.sort((a,b) => a.price - b.price);
+      const best = altHacks[0];
+      cont.innerHTML = `
+        <div style="background:var(--bg2); padding:16px 24px; border-radius:var(--radius-md); border:1px dashed var(--saffron); text-align:center; display:flex; flex-direction:column; align-items:center;">
+            <div style="color:var(--saffron); font-size:clamp(1.2rem, 2vw, 1.5rem); margin-bottom:8px;">⚠️ No Layover Hacks Today</div>
+            <div style="color:var(--text2); font-size:clamp(0.8rem, 1.5vw, 0.95rem); margin-bottom:16px; max-width:500px; line-height:1.5;">
+                We couldn't find any cheaper flights connecting through ${INDIAN_AIRPORTS[dest]?.name || dest} on your chosen date. However, we found a hack on another date!
+            </div>
+            <div style="background:var(--bg1); border:1px solid var(--border); padding:12px 24px; border-radius:var(--radius-sm); margin-bottom:16px; width:100%; max-width:400px;">
+                <div style="font-size:clamp(0.9rem, 1.8vw, 1.1rem); font-weight:600; color:var(--text); font-family:var(--mono); margin-bottom:4px;">
+                    ${fmtShort(best.dateObj)}: ${orig} → ${dest} → ${best.C}
+                </div>
+                <div style="color:var(--green); font-family:var(--mono); font-size:clamp(0.85rem, 1.5vw, 1rem);">
+                    Hack Fare: <strong>${fmt(best.price)}</strong> <span style="opacity:0.8; font-size:0.85em;">(Saves ${fmt(best.savings)})</span>
+                </div>
+            </div>
+            <button class="alert-btn" onclick="jumpDate('${best.dateStr}')" style="height:36px; padding:0 24px;">Track this Alternate Date</button>
+        </div>
+      `;
+  } else {
+      cont.innerHTML = `
+        <div style="background:var(--bg2); padding:16px; border-radius:var(--radius-md); border:1px solid var(--border); text-align:center; color:var(--text3); font-family:var(--mono); font-size:clamp(0.78rem, 1.5vw, 1rem);">
+            No layover hacks exist for this route within ±5 days.
+        </div>
+      `;
+  }
+}
+
+function renderBookButton() {
+  const d = currentData;
+  if (!d) return;
+
+  const containerMain = document.getElementById('book-now-injection-point');
+  const containerSavings = document.getElementById('small-book-injection');
+
+  const depStr = getLocalDateString(d.dep);
+  const cur = d.hist[d.hist.length - 1];
+  const oName = INDIAN_AIRPORTS[d.orig]?.name || d.orig;
+  const dName = INDIAN_AIRPORTS[d.dest]?.name || d.dest;
+
+  const ssUrl = `https://www.skyscanner.co.in/transport/flights/${d.orig.toLowerCase()}/${d.dest.toLowerCase()}/${depStr.replace(/-/g,'')}/`;
+
+  const btnHTML = `
+    <div class="book-now-wrap" style="margin-top: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 8px;">
+      <div style="width:100%; font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); text-align:center;">
+        Current fare ${fmt(cur)} for ${oName} → ${dName}
+      </div>
+      <a class="btn-book-primary" href="${ssUrl}" target="_blank" rel="noopener noreferrer" style="width: 100%;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>
+        </svg>
+        Book Now on Skyscanner
+      </a>
+      <div style="width:100%; font-size: clamp(0.6rem, 1.2vw, 0.7rem); color: var(--text3); font-family: var(--mono); line-height: 1.4; text-align: center; margin-top: 4px;">
+        ⚠️ <strong>Disclaimer:</strong> Prices and trends shown are algorithmic predictions, not live airline data. Final availability and fares on external sites may vary.
+      </div>
+    </div>
+  `;
+
+  const smallHTML = `
+    <div style="display: flex; flex-direction: column; align-items: inherit;">
+        <a class="btn-book-small" href="${ssUrl}" target="_blank" rel="noopener noreferrer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>
+          </svg>
+          Book Now
+        </a>
+        <div style="font-size: 0.55rem; color: var(--text3); font-family: var(--mono); line-height: 1.3; margin-top: 6px; max-width: 140px; opacity: 0.85;">
+          ⚠️ Predictions, not live data. External fares vary.
+        </div>
+    </div>
+  `;
+
+  if (containerMain) containerMain.innerHTML = btnHTML;
+  if (containerSavings) containerSavings.innerHTML = smallHTML;
+}
+
 function shareDeal(){
   if(!currentData){toast("Track a route first.");return;}
   const d=currentData,cur=d.hist[d.hist.length-1];
@@ -1376,7 +1543,6 @@ function shareDeal(){
   else{navigator.clipboard.writeText(txt).then(()=>toast('✅ Deal copied to clipboard!',true));}
 }
 
-// MAIN UPDATE
 function updateUI(){
   const d=currentData;if(!d)return;
   const cur=d.hist[d.hist.length-1],init=d.hist[0];
@@ -1427,7 +1593,6 @@ function updateUI(){
 
   document.getElementById('alert-result').className='alert-result';
 
-  // Core features
   renderSavingsBanner(cur,pred);
   renderScore(cur,low,pred,d.dtd);
   const localDepStr = getLocalDateString(d.dep);
@@ -1435,12 +1600,17 @@ function updateUI(){
   renderBestDay(d.orig,d.dest,localDepStr);
   renderDemand(d.orig,d.dest,d.dtd);
 
-  // New Extended Features
   renderHeatmap(d.orig, d.dest, localDepStr);
   renderSeasonality(d.base);
   renderFlightPath(d.orig, d.dest);
+  
+  renderConnectingFlights(d.orig, d.dest, localDepStr, d.dtd);
+  renderHiddenCity(d.orig, d.dest, localDepStr, d.dtd);
+
   document.getElementById('compare-result').style.display = 'none';
   document.getElementById('compare-dest').value = '';
+
+  renderBookButton();
 }
 
 function trackFlight(){
