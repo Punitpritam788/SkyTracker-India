@@ -77,6 +77,8 @@
   
   .hero-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-start; margin-top:12px; }
   .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:clamp(0.7rem, 1.5vw, 0.85rem); font-family:var(--mono); color:var(--text2); transition: all 0.4s; display: inline-flex; align-items: center; }
+  .hero-badge.interactive { cursor: pointer; }
+  .hero-badge.interactive:hover { border-color: var(--green); color: var(--text); transform: translateY(-1px); box-shadow: 0 0 10px rgba(62, 207, 142, 0.4); }
   .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; box-shadow:0 0 6px var(--green); }
 
   /* Modal Styles */
@@ -87,8 +89,8 @@
   .modal-icon { font-size: 3rem; margin-bottom: 12px; }
   .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
   .modal-text { font-size: 0.95rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; text-align: left; }
-  .modal-btn { background: var(--saffron); color: #000; border: none; border-radius: var(--radius-full); padding: 14px 32px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; box-shadow: 0 4px 12px rgba(255,140,0,0.3); }
-  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,140,0,0.4); }
+  .modal-btn { background: var(--green); color: #000; border: none; border-radius: var(--radius-full); padding: 14px 32px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; box-shadow: 0 4px 12px rgba(62,207,142,0.3); }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(62,207,142,0.4); }
   .close-modal { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text3); cursor: pointer; font-size: 1.2rem; }
 
   /* Skeleton Loading */
@@ -421,8 +423,12 @@
       <p class="hero-sub">330-day window · Tier-based dynamic pricing · 70+ airports</p>
     </div>
     <div class="hero-badges">
-      <span class="hero-badge"><span class="dot"></span>70+ Airports Active</span>
-      <span class="hero-badge"><span class="dot"></span>Metros · Capitals · Regional Hubs</span>
+      <span class="hero-badge interactive" onclick="openSettings()" title="Configure API">
+        <span class="dot" style="background: var(--blue); box-shadow: 0 0 6px var(--blue);"></span>Optional API Integration
+      </span>
+      <span class="hero-badge interactive" onclick="document.getElementById('disclaimer-modal').classList.add('show')" title="View Disclaimer">
+        <span class="dot" style="background: var(--saffron); box-shadow: 0 0 6px var(--saffron);"></span>Transparent Simulation
+      </span>
     </div>
   </div>
 
