@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="Track flight pricing lifecycles with predictive models and optional API integration.">
-<title>SkyTrackerIndia — Flight Lifecycle Tracking</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>SkyTrackerIndia — Flight Lifecycle Tracking (Simulated)</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -82,13 +81,14 @@
   /* Modal Styles */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
   .modal-overlay.show { opacity: 1; visibility: visible; }
-  .modal-content { background: var(--bg1); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: var(--sp-xl); max-width: 500px; width: 90%; box-shadow: var(--shadow-card); transform: translateY(20px); transition: all 0.3s ease; text-align: center; }
+  .modal-content { background: var(--bg1); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: var(--sp-xl); max-width: 500px; width: 90%; box-shadow: var(--shadow-card); transform: translateY(20px); transition: all 0.3s ease; text-align: center; position: relative; }
   .modal-overlay.show .modal-content { transform: translateY(0); }
   .modal-icon { font-size: 3rem; margin-bottom: 12px; }
   .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
   .modal-text { font-size: 0.95rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; text-align: left; }
   .modal-btn { background: var(--saffron); color: #000; border: none; border-radius: var(--radius-full); padding: 14px 32px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; box-shadow: 0 4px 12px rgba(255,140,0,0.3); }
   .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,140,0,0.4); }
+  .close-modal { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text3); cursor: pointer; font-size: 1.2rem; }
 
   /* Skeleton Loading */
   .skeleton-layer { position: relative; overflow: hidden; pointer-events: none; }
@@ -132,6 +132,8 @@
   .search-orb:hover { transform:scale(1.07); box-shadow:0 4px 16px rgba(255,140,0,0.5); }
   .search-orb:active { transform:scale(0.95); }
   .search-orb svg { width:20px; height:20px; }
+  .search-orb.loading { pointer-events: none; opacity: 0.8; animation: pulse 1s infinite alternate; }
+  @keyframes pulse { from { transform: scale(0.95); } to { transform: scale(1.05); } }
 
   .savings-banner { display:none; background:linear-gradient(135deg,rgba(62,207,142,0.08) 0%,rgba(255,140,0,0.06) 100%); border:1px solid rgba(62,207,142,0.22); border-radius:var(--radius-md); padding:var(--sp-base) var(--sp-xl); margin-bottom:var(--sp-xl); align-items:center; justify-content:space-between; gap:var(--sp-base); animation:slideDown 0.4s ease; width: 100%; }
   .savings-banner.visible { display:flex; }
@@ -181,7 +183,7 @@
   .content-grid > .panel:last-child { flex: 1 1 min(100%, 360px); min-width:0; }
   .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; width: 100%; }
   .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(16px, 2vw, 24px); flex-wrap:wrap; gap:12px; }
-  .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); display: flex; align-items: center; }
+  .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); display: flex; align-items: center; gap: 6px;}
   
   .chart-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-md); padding:4px; max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
   .chart-tabs::-webkit-scrollbar { display: none; }
@@ -201,6 +203,11 @@
   .rec-buy .rec-action{color:var(--green);} .rec-wait .rec-action{color:var(--saffron);} .rec-caution .rec-action{color:var(--red);}
   .rec-detail { font-size:clamp(0.8rem, 1.5vw, 1rem); color:var(--text2); line-height:1.65; }
   
+  .ai-insight { background: rgba(77, 184, 160, 0.05); border-left: 4px solid var(--blue); padding: 16px; border-radius: 0 var(--radius-md) var(--radius-md) 0; margin-bottom: var(--sp-base); display: none; }
+  .ai-insight.visible { display: block; animation: fadeUp 0.5s ease forwards; }
+  .ai-text { font-size: 0.9rem; color: var(--text2); line-height: 1.6; }
+  .ai-text strong { color: var(--text); }
+
   .stat-row { display:flex; justify-content:space-between; align-items:center; padding:clamp(12px, 1.5vw, 16px) 0; border-bottom:1px solid var(--border); }
   .stat-row:last-child{border-bottom:none;}
   .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); text-transform:uppercase; letter-spacing:0.06em; }
@@ -325,7 +332,7 @@
 
   /* Modals */
   .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
-  .modal-overlay.active { display: flex; }
+  .modal-overlay.show { display: flex; }
   .modal-content { background: var(--modal-bg); border: 1px solid var(--border2); border-radius: var(--radius-md); padding: clamp(24px, 4vw, 32px); max-width: 500px; width: 100%; box-shadow: var(--shadow-hover); position: relative; }
   .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
   .modal-body { font-size: 0.95rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
@@ -739,7 +746,10 @@
     <button class="close-modal" onclick="closeSettings()" aria-label="Close Settings">✕</button>
     <div class="modal-title">Settings & API</div>
     <div class="modal-body">
-      <p style="margin-bottom: 12px;">Connect a live flight API (like AviationStack or Amadeus) to replace the simulation model with live data. (Requires CORS access).</p>
+      <p style="margin-bottom: 8px;">Connect a live flight API to replace the simulation model with live data. (Requires CORS access).</p>
+      <p style="margin-bottom: 16px; font-size: 0.85rem; color: var(--text3);">
+        Get a free API key from: <a href="https://aviationstack.com/" target="_blank" rel="noopener noreferrer" style="color: var(--saffron); text-decoration: underline; font-weight: 500;">AviationStack</a> or <a href="https://developers.amadeus.com/" target="_blank" rel="noopener noreferrer" style="color: var(--saffron); text-decoration: underline; font-weight: 500;">Amadeus</a>.
+      </p>
       <label class="seg-label" style="display:block; margin-bottom:4px;" for="api-key-input">Live API Key (Optional)</label>
       <input class="alert-input" id="api-key-input" type="text" placeholder="Enter API Key or leave blank for simulation" style="width: 100%; margin-bottom: 16px;">
     </div>
@@ -783,22 +793,22 @@ let userApiKey = localStorage.getItem('skytracker_api_key') || '';
 
 function checkFirstLoad() {
   if (!localStorage.getItem('skytracker_disclaimer_accepted')) {
-    document.getElementById('disclaimer-modal').classList.add('active');
+    document.getElementById('disclaimer-modal').classList.add('show');
   }
 }
 
 function acceptDisclaimer() {
   localStorage.setItem('skytracker_disclaimer_accepted', 'true');
-  document.getElementById('disclaimer-modal').classList.remove('active');
+  document.getElementById('disclaimer-modal').classList.remove('show');
 }
 
 function openSettings() {
   document.getElementById('api-key-input').value = userApiKey;
-  document.getElementById('settings-modal').classList.add('active');
+  document.getElementById('settings-modal').classList.add('show');
 }
 
 function closeSettings() {
-  document.getElementById('settings-modal').classList.remove('active');
+  document.getElementById('settings-modal').classList.remove('show');
 }
 
 function saveApiKey() {
