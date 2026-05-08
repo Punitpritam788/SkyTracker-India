@@ -4,7 +4,7 @@
 
 🔗 **[Live Demo](https://punitpritam788.github.io/SkyTracker-India/)**
 
-SkyTracker India is an intelligent flight pricing tracker that monitors airfare dynamics across India's 70+ airports spanning metros, capitals, and regional hubs. Track the complete 330-day booking lifecycle from flight listing to departure, visualize real-time price trends with interactive charts, and get AI-powered fare forecasts to identify the best booking windows. Our Smart Booking Score (0-100) delivers personalized deal ratings, while advanced analytics including price heatmaps, demand indicators, route comparisons, and seasonal breakdowns help you make data-driven, cost-effective flight decisions.
+SkyTracker India is an intelligent flight pricing tracker that monitors airfare dynamics across India's 70+ airports spanning metros, capitals, and regional hubs. Track the complete 330-day booking lifecycle and make data-driven decisions with predictive analytics, real-time price curves, and AI-powered recommendations.
 
 ![GitHub](https://img.shields.io/badge/License-MIT-blue)
 ![HTML](https://img.shields.io/badge/Built%20with-HTML%20%7C%20CSS%20%7C%20JavaScript-orange)
@@ -21,11 +21,11 @@ SkyTracker India is an intelligent flight pricing tracker that monitors airfare 
 - Track the entire booking lifecycle across 70+ Indian airports
 - Historical data analysis from T-330 to T-0 days with lifecycle progress visualization
 
-### 📈 **Intelligent Forecasting**
-- AI-powered price predictions at departure with forecast confidence breakdown
-- Identify peak and valley periods in the booking window
-- Trend analysis with 7-day, 30-day, 90-day, and full 330-day views
-- Visual price curve with interactive zoom capabilities
+### 📈 **Price Lifecycle Curve**
+- Interactive Chart.js powered price visualization with multiple zoom levels
+- 7-day, 30-day, 90-day, and full 330-day trend analysis views
+- Real-time curve with predictive forecasting overlay
+- Dynamic pricing patterns based on booking window proximity
 
 ### 💡 **Smart Booking Score (0-100)**
 - Dynamic deal rating based on current fare position, days remaining, and trajectory
@@ -33,7 +33,7 @@ SkyTracker India is an intelligent flight pricing tracker that monitors airfare 
 - Contextual recommendations for optimal booking decisions
 - Real-time savings calculation vs. departure-day forecast
 
-### 📅 **Flex Date Finder**
+### 📅 **Flex Date Finder (±3 Days)**
 - Compare prices ±3 days around your preferred departure date
 - Identify cheapest dates at a glance with "BEST" badge highlighting
 - Single-click re-tracking for alternative dates
@@ -78,6 +78,12 @@ SkyTracker India is an intelligent flight pricing tracker that monitors airfare 
 - Smooth animations and hover effects
 - Toast notifications for user feedback
 
+### 🔌 **Optional API Integration**
+- Connect live flight data via AviationStack API (optional)
+- Fallback to advanced predictive simulation model
+- Seamless switching between live and simulated data
+- CORS-compatible setup for production deployments
+
 ---
 
 ## 🚀 Quick Start
@@ -113,6 +119,7 @@ xdg-open index.html  # Linux
 - **Mapping**: Leaflet.js for route path display
 - **Fonts**: Google Fonts (Outfit, Fira Code)
 - **Data**: Seeded pseudo-random generation for realistic fare simulation
+- **Optional API**: AviationStack for live flight data integration
 
 ---
 
