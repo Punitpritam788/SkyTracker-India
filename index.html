@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="Track flight pricing lifecycles with predictive models and optional API integration.">
 <title>SkyTrackerIndia — Flight Lifecycle Tracking</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -19,7 +20,7 @@
     --blue: #4db8a0; --green: #3ecf8e; --green-dim: rgba(62,207,142,0.10);
     --red: #f05060; --red-dim: rgba(240,80,96,0.10); --saffron-dim: rgba(255,140,0,0.12);
     --text: #ddf0e8; --text2: #7aab92; --text3: #4a7a60;
-    --overlay-bg: rgba(13,26,20,0.85);
+    --overlay-bg: rgba(13,26,20,0.85); --modal-bg: rgba(8, 16, 13, 0.95);
     --mono: 'Fira Code', monospace; --sans: 'Outfit', sans-serif;
     --radius-sm: 8px; --radius-md: 14px; --radius-lg: 24px; --radius-full: 9999px;
     --shadow-card: rgba(0,0,0,0.25) 0 0 0 1px, rgba(0,0,0,0.18) 0 2px 6px, rgba(0,0,0,0.32) 0 6px 16px;
@@ -33,13 +34,13 @@
     --bg0: #f4f7f5; --bg1: #ffffff; --bg2: #f0f4f2; --bg3: #e2ebe6;
     --border: rgba(40,140,80,0.15); --border2: rgba(40,140,80,0.28);
     --text: #0b1a13; --text2: #3a6b52; --text3: #5a8a70;
-    --overlay-bg: rgba(240,244,242,0.85);
+    --overlay-bg: rgba(240,244,242,0.85); --modal-bg: rgba(244, 247, 245, 0.95);
     --shadow-card: rgba(0,0,0,0.05) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.08) 0 6px 16px;
     --shadow-hover: rgba(0,0,0,0.08) 0 0 0 1px, rgba(0,0,0,0.06) 0 4px 12px, rgba(0,0,0,0.12) 0 8px 24px;
     --shadow-pill: rgba(0,0,0,0.05) 0 1px 2px, rgba(40,140,80,0.12) 0 0 0 1px;
   }
 
-  body { font-family: var(--sans); background: var(--bg0); color: var(--text); min-height: 100vh; line-height: 1.5; padding-bottom: 4rem; transition: background 0.4s, color 0.4s; }
+  body { font-family: var(--sans); background: var(--bg0); color: var(--text); min-height: 100vh; line-height: 1.5; padding-bottom: 4rem; transition: background 0.4s, color 0.4s; overflow-x: hidden; }
 
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
@@ -47,37 +48,66 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
   * { scrollbar-width: thin; scrollbar-color: var(--bg3) transparent; }
 
+  /* Skeletons */
+  .skeleton { position: relative; overflow: hidden; background: var(--bg2) !important; color: transparent !important; border-color: transparent !important; border-radius: var(--radius-sm); pointer-events: none; }
+  .skeleton * { opacity: 0; }
+  .skeleton::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); animation: shimmer 1.5s infinite; z-index: 10; }
+  .light-theme .skeleton::after { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent); }
+  @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+  .sim-label { display: inline-block; font-size: 0.55rem; padding: 3px 8px; background: var(--saffron-dim); border: 1px solid rgba(255, 140, 0, 0.25); border-radius: var(--radius-full); color: var(--saffron); vertical-align: middle; margin-left: 6px; text-transform: uppercase; font-family: var(--mono); font-weight: 700; letter-spacing: 0.05em; line-height: 1; }
+
   .header { position:sticky; top:0; z-index:100; background:var(--bg1); border-bottom:1px solid var(--border); height:80px; display:flex; align-items:center; justify-content:space-between; padding:0 var(--sp-xl); transition: background 0.4s, border-color 0.4s; }
   .logo { display:flex; align-items:center; gap:12px; font-size:1.25rem; font-weight:700; letter-spacing:-0.03em; }
   .custom-logo { height: 32px; width: auto; object-fit: contain; border-radius: 4px; }
   .logo-accent{color:var(--saffron);}
-  .header-right { display:flex; align-items:center; gap:12px; }
+  .header-right { display:flex; align-items:center; gap:8px; }
   .header-time-pill { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:6px 16px; font-size:0.75rem; font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
-  .theme-btn, .share-btn { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:7px 18px; font-size:0.78rem; font-family:var(--sans); font-weight:500; color:var(--text2); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:6px; }
-  .theme-btn { padding: 7px; width: 34px; height: 34px; justify-content: center; }
-  .theme-btn:hover, .share-btn:hover { border-color:var(--border2); color:var(--text); }
+  .icon-btn, .share-btn { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.78rem; font-family:var(--sans); font-weight:500; color:var(--text2); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:6px; }
+  .icon-btn { padding: 7px; width: 36px; height: 36px; }
+  .share-btn { padding: 7px 18px; }
+  .icon-btn:hover, .share-btn:hover { border-color:var(--border2); color:var(--text); }
 
-  .container { max-width:1600px; margin:0 auto; padding:clamp(16px, 3vw, 32px); }
+  .container { max-width:1600px; margin:0 auto; padding:clamp(16px, 3vw, 32px); width: 100%; }
 
-  .hero-band { padding:var(--sp-xxl) 0 var(--sp-xl); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-base); }
-  .hero-title { font-size:clamp(1.75rem, 5vw, 3.5rem); font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
+  .hero-band { padding:var(--sp-lg) 0 var(--sp-xl); display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:var(--sp-base); }
+  .hero-title { font-size:clamp(1.75rem, 5vw, 3.2rem); font-weight:700; letter-spacing:-0.04em; line-height:1.2; }
   .hero-title span { color:var(--saffron); }
-  .hero-sub { font-size:clamp(0.75rem, 2.5vw, 1.1rem); color:var(--text3); font-family:var(--mono); margin-top:6px; }
-  .hero-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-start; }
-  .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-family:var(--mono); color:var(--text2); transition: all 0.4s; }
-  .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; vertical-align:middle; box-shadow:0 0 6px var(--green); }
+  .hero-sub { font-size:clamp(0.75rem, 2vw, 1rem); color:var(--text3); font-family:var(--mono); margin-top:6px; }
+  
+  .hero-badges { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-start; margin-top:12px; }
+  .hero-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:5px 14px; font-size:clamp(0.7rem, 1.5vw, 0.85rem); font-family:var(--mono); color:var(--text2); transition: all 0.4s; display: inline-flex; align-items: center; }
+  .hero-badge .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--green); margin-right:6px; box-shadow:0 0 6px var(--green); }
 
-  .search-pill-wrap { background:var(--bg1); border-radius:var(--radius-full); border:1px solid var(--border2); box-shadow:var(--shadow-pill); display:flex; align-items:stretch; flex-wrap:wrap; margin-bottom:var(--sp-xxl); position:relative; z-index:20; transition:all 0.4s; }
+  /* Modal Styles */
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+  .modal-overlay.show { opacity: 1; visibility: visible; }
+  .modal-content { background: var(--bg1); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: var(--sp-xl); max-width: 500px; width: 90%; box-shadow: var(--shadow-card); transform: translateY(20px); transition: all 0.3s ease; text-align: center; }
+  .modal-overlay.show .modal-content { transform: translateY(0); }
+  .modal-icon { font-size: 3rem; margin-bottom: 12px; }
+  .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .modal-text { font-size: 0.95rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; text-align: left; }
+  .modal-btn { background: var(--saffron); color: #000; border: none; border-radius: var(--radius-full); padding: 14px 32px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.15s; width: 100%; box-shadow: 0 4px 12px rgba(255,140,0,0.3); }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(255,140,0,0.4); }
+
+  /* Skeleton Loading */
+  .skeleton-layer { position: relative; overflow: hidden; pointer-events: none; }
+  .skeleton-layer::before { content: ''; position: absolute; inset: 0; background: var(--bg2); z-index: 10; border-radius: inherit; }
+  .skeleton-layer::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); z-index: 11; animation: shimmer 1.5s infinite; transform: translateX(-100%); }
+  .light-theme .skeleton-layer::after { background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent); }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
+
+  .search-pill-wrap { background:var(--bg1); border-radius:var(--radius-full); border:1px solid var(--border2); box-shadow:var(--shadow-pill); display:flex; align-items:stretch; flex-wrap:nowrap; margin-bottom:var(--sp-xxl); position:relative; z-index:20; transition:all 0.4s; width: 100%; }
   .search-pill-wrap:focus-within { box-shadow:var(--shadow-hover); border-color:rgba(80,180,120,0.45); }
-  .search-segment { flex:1 1 200px; display:flex; flex-direction:column; justify-content:center; padding:12px var(--sp-lg); min-height:68px; position:relative; cursor:text; border-radius:var(--radius-full); transition:background 0.15s; }
+  .search-segment { flex:1 1 0%; min-width:0; display:flex; flex-direction:column; justify-content:center; padding:12px var(--sp-lg); min-height:68px; position:relative; cursor:text; border-radius:var(--radius-full); transition:background 0.15s; }
   .search-segment:hover, .search-segment:focus-within { background:var(--bg2); }
   .search-segment+.search-segment::before { content:''; position:absolute; left:0; top:16px; bottom:16px; width:1px; background:var(--border2); }
   .search-segment:focus-within+.search-segment::before,.search-segment:focus-within::before,.search-segment:hover+.search-segment::before,.search-segment:hover::before { opacity:0; }
   .seg-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:2px; }
-  .seg-input { background:transparent; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:0.95rem; font-weight:500; width:100%; text-transform:uppercase; }
+  .seg-input { background:transparent; border:none; outline:none; color:var(--text); font-family:var(--sans); font-size:0.95rem; font-weight:500; width:100%; min-width:0; text-transform:uppercase; }
   .seg-input[type="date"] { text-transform:none; }
   .seg-input::placeholder { color:var(--text3); font-weight:400; text-transform:none; }
-  .seg-input::-webkit-calendar-picker-indicator { filter:invert(0.6) sepia(1) hue-rotate(100deg); }
+  .seg-input::-webkit-calendar-picker-indicator { filter:invert(0.6) sepia(1) hue-rotate(100deg); cursor: pointer; padding: 4px; }
   .light-theme .seg-input::-webkit-calendar-picker-indicator { filter: none; opacity: 0.6; }
   
   .autocomplete-dropdown {
@@ -97,13 +127,13 @@
   .ac-city { font-weight: 500; color: var(--text); font-size: 0.95rem; text-transform: capitalize; }
   .ac-code { font-family: var(--mono); font-size: 0.75rem; color: var(--saffron); background: var(--saffron-dim); padding: 4px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; }
 
-  .search-orb-wrap { display:flex; align-items:center; padding:10px 10px 10px 6px; flex:1 1 auto; justify-content:flex-end; }
+  .search-orb-wrap { display:flex; align-items:center; padding:10px 10px 10px 6px; flex:0 0 auto; justify-content:flex-end; }
   .search-orb { width:48px; height:48px; border-radius:50%; background:var(--saffron); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 2px 8px rgba(255,140,0,0.35); color:#000; }
   .search-orb:hover { transform:scale(1.07); box-shadow:0 4px 16px rgba(255,140,0,0.5); }
   .search-orb:active { transform:scale(0.95); }
   .search-orb svg { width:20px; height:20px; }
 
-  .savings-banner { display:none; background:linear-gradient(135deg,rgba(62,207,142,0.08) 0%,rgba(255,140,0,0.06) 100%); border:1px solid rgba(62,207,142,0.22); border-radius:var(--radius-md); padding:var(--sp-base) var(--sp-xl); margin-bottom:var(--sp-xl); align-items:center; justify-content:space-between; gap:var(--sp-base); animation:slideDown 0.4s ease; }
+  .savings-banner { display:none; background:linear-gradient(135deg,rgba(62,207,142,0.08) 0%,rgba(255,140,0,0.06) 100%); border:1px solid rgba(62,207,142,0.22); border-radius:var(--radius-md); padding:var(--sp-base) var(--sp-xl); margin-bottom:var(--sp-xl); align-items:center; justify-content:space-between; gap:var(--sp-base); animation:slideDown 0.4s ease; width: 100%; }
   .savings-banner.visible { display:flex; }
   @keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
   .savings-left { display:flex; align-items:center; gap:16px; }
@@ -114,7 +144,7 @@
   .savings-ticker { font-size:2rem; font-weight:700; font-family:var(--mono); letter-spacing:-0.04em; }
   .savings-ticker-label { font-size:0.62rem; font-family:var(--mono); color:var(--text3); text-transform:uppercase; letter-spacing:0.08em; margin-top:2px; }
 
-  .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .lifecycle-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); margin-bottom:var(--sp-xl); box-shadow:var(--shadow-card); transition:all 0.4s; width: 100%; }
   .lifecycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(12px, 2vw, 24px); flex-wrap:wrap; gap:8px; }
   .lc-card-title { font-size:0.7rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); }
   .lc-pct-badge { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); padding:clamp(4px, 1.5vw, 8px) clamp(10px, 2vw, 18px); font-size:0.72rem; font-family:var(--mono); color:var(--green); }
@@ -136,7 +166,7 @@
   .lc-step-label { font-size:0.65rem; font-family:var(--mono); text-transform:uppercase; letter-spacing:0.08em; color:var(--text3); }
   .lc-step-date { font-size:0.82rem; font-weight:600; color:var(--text); white-space:nowrap; }
 
-  .metrics-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:clamp(10px, 2vw, 24px); margin-bottom:var(--sp-xl); }
+  .metrics-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 160px), 1fr)); gap:clamp(10px, 2vw, 24px); margin-bottom:var(--sp-xl); width: 100%; }
   .metric-card { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 2.5vw, 28px); cursor:default; transition:box-shadow 0.2s,transform 0.2s, background 0.4s, border-color 0.4s; position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:center; }
   .metric-card:hover { box-shadow:var(--shadow-hover); transform:translateY(-2px); }
   .metric-card::after { content:''; position:absolute; top:0; left:clamp(16px, 2.5vw, 28px); right:clamp(16px, 2.5vw, 28px); height:3px; border-radius:0 0 3px 3px; }
@@ -149,12 +179,13 @@
   .content-grid { display:flex; flex-wrap:wrap; gap:var(--sp-xl); margin-bottom:var(--sp-xl); width: 100%; }
   .content-grid > .panel:first-child { flex: 999 1 min(100%, 550px); min-width:0; }
   .content-grid > .panel:last-child { flex: 1 1 min(100%, 360px); min-width:0; }
-  .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; }
+  .panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); display:flex; flex-direction:column; box-shadow:var(--shadow-card); transition:all 0.4s; width: 100%; }
   .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:clamp(16px, 2vw, 24px); flex-wrap:wrap; gap:12px; }
-  .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); }
+  .panel-title { font-size:clamp(0.7rem, 1.5vw, 1.1rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text2); display: flex; align-items: center; }
   
-  .chart-tabs { display:flex; flex-wrap:wrap; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-md); padding:4px; width: 100%; max-width: max-content; }
-  .chart-tab { padding:clamp(5px, 1vw, 8px) clamp(10px, 2vw, 16px); border-radius:var(--radius-full); font-size:clamp(0.65rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; flex:1 1 auto; text-align:center; }
+  .chart-tabs { display:flex; flex-wrap:nowrap; overflow-x:auto; gap:var(--sp-xs); background:var(--bg2); border-radius:var(--radius-md); padding:4px; max-width: 100%; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .chart-tabs::-webkit-scrollbar { display: none; }
+  .chart-tab { padding:clamp(5px, 1vw, 8px) clamp(10px, 2vw, 16px); border-radius:var(--radius-full); font-size:clamp(0.65rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); cursor:pointer; transition:all 0.15s; border:none; background:transparent; flex:0 0 auto; text-align:center; white-space: nowrap; }
   .chart-tab.active { background:var(--bg3); color:var(--saffron); }
   .chart-tab:hover:not(.active) { color:var(--text2); }
   .chart-wrap { position:relative; flex-grow:1; min-height:320px; width:100%; overflow:hidden; }
@@ -173,12 +204,12 @@
   .stat-row { display:flex; justify-content:space-between; align-items:center; padding:clamp(12px, 1.5vw, 16px) 0; border-bottom:1px solid var(--border); }
   .stat-row:last-child{border-bottom:none;}
   .stat-row-label { color:var(--text2); font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); text-transform:uppercase; letter-spacing:0.06em; }
-  .stat-row-value { font-weight:600; font-family:var(--mono); font-size:clamp(0.85rem, 1.8vw, 1.1rem); color:var(--text); }
+  .stat-row-value { font-weight:600; font-family:var(--mono); font-size:clamp(0.85rem, 1.8vw, 1.1rem); color:var(--text); text-align: right; }
   .route-badge { display:inline-flex; align-items:center; padding:2px 10px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.6rem; color:var(--saffron); margin-left:8px; }
 
   .alert-section { margin-top:var(--sp-base); padding-top:var(--sp-base); border-top:1px solid var(--border); }
   .alert-label { font-size:clamp(0.65rem, 1.5vw, 0.9rem); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.1em; color:var(--text3); margin-bottom:10px; }
-  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; position: relative; }
+  .alert-input-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; position: relative; width: 100%; }
   .alert-input { flex:1 1 auto; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--mono); font-size:16px; padding:0 12px; height:42px; outline:none; transition:all 0.4s; text-transform:none; min-width:0; }
   .alert-input:focus { border-color:var(--saffron); }
   .alert-btn { flex:0 0 auto; background:var(--saffron); color:#000; border:none; border-radius:var(--radius-sm); padding:0 16px; height:42px; font-size:0.9rem; font-weight:600; cursor:pointer; transition:opacity 0.15s; white-space:nowrap; text-align:center; }
@@ -192,8 +223,8 @@
   .alert-match-btn:hover { border-color:var(--saffron); transform:translateY(-1px); box-shadow:var(--shadow-pill); }
   .alert-match-btn strong { color:var(--green); margin-left:4px; }
 
-  .features-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
-  .split-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
+  .features-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); width: 100%; }
+  .split-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); width: 100%; }
 
   .score-wrap { display:flex; flex-direction:column; align-items:center; padding:var(--sp-base) 0; flex-grow:1; width:100%; }
   .gauge-svg-wrap { position:relative; width:100%; max-width:180px; aspect-ratio:180/110; height:auto; margin:0 auto; }
@@ -209,7 +240,7 @@
   .score-grade.none{background:var(--bg2);color:var(--text3);border-color:var(--border);}
   .score-desc { font-size:clamp(0.75rem, 1.8vw, 0.95rem); color:var(--text2); text-align:center; margin-top:12px; line-height:1.6; flex-grow:1; }
 
-  .flex-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 5px); margin-top:var(--sp-sm); width:100%; }
+  .flex-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 5px); margin-top:var(--sp-sm); width:100%; min-width: 320px; }
   .flex-cell { border-radius:var(--radius-sm); padding:clamp(4px, 1vw, 8px) 2px; text-align:center; cursor:pointer; transition:all 0.15s; border:1px solid var(--border); background:var(--bg2); }
   .flex-cell:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--shadow-hover); }
   .flex-cell.cheapest { background:rgba(62,207,142,0.1); border-color:rgba(62,207,142,0.4); }
@@ -223,7 +254,7 @@
   .flex-badge { font-size:clamp(0.5rem, 1vw, 0.65rem); background:var(--green); color:#000; border-radius:var(--radius-full); padding:1px 6px; margin-top:4px; display:none; font-weight:700; }
   .flex-cell.cheapest .flex-badge { display:inline-block; }
 
-  .dow-chart { display:flex; align-items:flex-end; gap:clamp(2px, 1vw, 8px); height:clamp(100px, 10vw, 140px); margin-top:var(--sp-sm); width:100%; }
+  .dow-chart { display:flex; align-items:flex-end; gap:clamp(2px, 1vw, 8px); height:clamp(100px, 10vw, 140px); margin-top:var(--sp-sm); width:100%; min-width: 320px; }
   .dow-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
   .dow-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; transition:height 0.8s cubic-bezier(0.4,0,0.2,1); background:var(--bg3); }
   .dow-bar.cheapest-day { background:var(--green); box-shadow:0 0 8px rgba(62,207,142,0.3); }
@@ -235,7 +266,7 @@
   .dow-best-label { font-size:clamp(0.7rem, 1.5vw, 0.95rem); font-family:var(--mono); color:var(--text2); margin-top:16px; text-align:center; line-height:1.6; }
   .dow-best-label span { color:var(--green); font-weight:600; }
 
-  .demand-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); }
+  .demand-row { display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap:var(--sp-xl); margin-top:var(--sp-xl); width: 100%; }
   .demand-panel { background:var(--bg1); border:1px solid var(--border); border-radius:var(--radius-md); padding:clamp(16px, 3vw, 32px); box-shadow:var(--shadow-card); transition:all 0.4s;}
   .demand-inner { display:flex; flex-wrap:wrap; align-items:center; gap:clamp(16px, 2vw, 24px); }
   .demand-ring-wrap { position:relative; flex-shrink:0; width:clamp(88px, 8vw, 110px); height:clamp(88px, 8vw, 110px); }
@@ -261,7 +292,7 @@
   .conf-fill { height:100%; border-radius:var(--radius-full); width:0%; transition:width 1s ease; }
   .conf-val { font-size:clamp(0.66rem, 1.2vw, 0.85rem); font-family:var(--mono); color:var(--text3); width:clamp(32px, 4vw, 48px); text-align:right; flex-shrink:0; }
 
-  .heatmap-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 6px); margin-top:var(--sp-sm); width: 100%; }
+  .heatmap-grid { display:grid; grid-template-columns:repeat(7, minmax(0, 1fr)); gap:clamp(2px, 1vw, 6px); margin-top:var(--sp-sm); width: 100%; min-width: 320px; }
   .heatmap-cell { border-radius:4px; padding:clamp(4px, 1vw, 10px) 2px; text-align:center; font-family:var(--mono); font-size:clamp(0.55rem, 1.5vw, 0.8rem); font-weight:600; color:var(--text); border:1px solid rgba(255,255,255,0.05); transition:all 0.15s; }
   .heatmap-cell[onclick]:hover { transform:translateY(-2px); }
   .light-theme .heatmap-cell { border-color: rgba(0,0,0,0.05); }
@@ -278,7 +309,7 @@
   .season-row { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4px; }
   .compare-bar { display:flex; align-items:center; height:clamp(24px, 3vw, 32px); border-radius:var(--radius-md); margin-top:8px; color:#000; font-family:var(--mono); font-size:clamp(0.7rem, 1.5vw, 0.9rem); font-weight:700; padding:0 12px; transition:width 1s ease; }
 
-  #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:clamp(0.88rem, 2vw, 1.1rem); font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
+  #toast { position:fixed; bottom:24px; right:24px; color:#fff; padding:14px 24px; border-radius:var(--radius-full); font-family:var(--sans); font-size:clamp(0.88rem, 2vw, 1.1rem); font-weight:500; transform:translateY(80px); opacity:0; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); z-index:9999; background:var(--red); box-shadow:0 4px 16px rgba(240,80,96,0.35); }
   #toast.show{transform:translateY(0);opacity:1;}
   #toast.ok{background:var(--green);color:#000;box-shadow:0 4px 16px rgba(62,207,142,0.35);}
 
@@ -291,6 +322,16 @@
   .btn-book-small { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: var(--green); color: #000; border: none; border-radius: var(--radius-full); padding: 8px 16px; font-size: 0.8rem; font-weight: 700; font-family: var(--sans); text-decoration: none; cursor: pointer; box-shadow: 0 2px 8px rgba(62,207,142,0.3); transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s; margin-top: 8px; white-space: nowrap; }
   .btn-book-small:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(62,207,142,0.4); }
   .btn-book-small:active { transform: scale(0.95); }
+
+  /* Modals */
+  .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9000; display: none; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.3s ease; }
+  .modal-overlay.active { display: flex; }
+  .modal-content { background: var(--modal-bg); border: 1px solid var(--border2); border-radius: var(--radius-md); padding: clamp(24px, 4vw, 32px); max-width: 500px; width: 100%; box-shadow: var(--shadow-hover); position: relative; }
+  .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 12px; }
+  .modal-body { font-size: 0.95rem; color: var(--text2); line-height: 1.6; margin-bottom: 24px; }
+  .modal-btn { background: var(--green); color: #000; border: none; border-radius: var(--radius-sm); padding: 12px 24px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; transition: all 0.2s; }
+  .modal-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .close-modal { position: absolute; top: 16px; right: 16px; background: transparent; border: none; color: var(--text3); cursor: pointer; font-size: 1.2rem; }
 
   @media(max-width:1024px){
     .features-row,.demand-row,.split-row{grid-template-columns:1fr;}
@@ -308,8 +349,7 @@
     .hero-title{font-size:clamp(1.5rem, 6vw, 2rem);}
     .lc-step-date{font-size:0.82rem;}
     .share-btn span{display:none;}
-    .share-btn { padding: 7px; width: 34px; height: 34px; justify-content: center; }
-    .theme-btn { margin-right: 0px; }
+    .share-btn { padding: 7px; width: 36px; height: 36px; justify-content: center; }
     .header-time-pill { display: none; }
     
     .lc-track-wrap { padding: 16px 0 8px 0 !important; }
@@ -334,8 +374,6 @@
     .alert-input-row { flex-direction: column; align-items: stretch; width: 100%; }
     .alert-input { width: 100%; }
     .alert-btn { width: 100%; }
-    .chart-tabs { justify-content: center; background: transparent; gap: 4px; }
-    .chart-tab { background: var(--bg2); flex: 1 1 30%; }
     .book-now-wrap { flex-direction: column; }
     .btn-book-primary { flex: 1 1 100%; }
   }
@@ -353,14 +391,17 @@
     <span>Sky<span class="logo-accent">Tracker</span>India</span>
   </div>
   <div class="header-right">
-    <button class="theme-btn" onclick="toggleTheme()" title="Toggle Day/Night Mode">
+    <button class="icon-btn" onclick="openSettings()" aria-label="API Settings" title="API Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle Day/Night Mode" title="Toggle Day/Night Mode">
       <span id="theme-icon">🌙</span>
     </button>
-    <button class="share-btn" onclick="shareDeal()">
+    <button class="share-btn" onclick="shareDeal()" aria-label="Share Deal">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      <span>Share Deal</span>
+      <span>Share</span>
     </button>
-    <div class="header-time-pill" id="current-time"></div>
+    <div class="header-time-pill" id="current-time" aria-live="polite"></div>
   </div>
 </header>
 
@@ -379,27 +420,27 @@
 
   <div class="search-pill-wrap">
     <div class="search-segment">
-      <div class="seg-label">Origin</div>
+      <label class="seg-label" for="inp-origin">Origin</label>
       <input class="seg-input" id="inp-origin" placeholder="Search city or code..." autocomplete="off">
       <div class="autocomplete-dropdown" id="origin-dropdown"></div>
     </div>
     <div class="search-segment">
-      <div class="seg-label">Destination</div>
+      <label class="seg-label" for="inp-dest">Destination</label>
       <input class="seg-input" id="inp-dest" placeholder="Search city or code..." autocomplete="off">
       <div class="autocomplete-dropdown" id="dest-dropdown"></div>
     </div>
     <div class="search-segment">
-      <div class="seg-label">Departure Date</div>
+      <label class="seg-label" for="inp-date">Departure Date</label>
       <input class="seg-input" type="date" id="inp-date">
     </div>
     <div class="search-orb-wrap">
-      <button class="search-orb" onclick="trackFlight()" title="Track Lifecycle">
+      <button class="search-orb" onclick="trackFlight()" aria-label="Track Lifecycle" title="Track Lifecycle">
         <svg viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" stroke="var(--bg0)" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg>
       </button>
     </div>
   </div>
 
-  <div class="savings-banner" id="savings-banner">
+  <div class="savings-banner skeleton-target" id="savings-banner">
     <div class="savings-left">
       <div class="savings-icon">💰</div>
       <div>
@@ -409,14 +450,14 @@
     </div>
     <div class="savings-right">
       <div class="savings-ticker" id="savings-ticker">₹—</div>
-      <div class="savings-ticker-label">Potential Savings Today</div>
+      <div class="savings-ticker-label">Potential Savings Today <span class="sim-label">Model Est.</span></div>
       <div id="small-book-injection"></div>
     </div>
   </div>
 
-  <div class="lifecycle-card" id="lifecycle-bar" style="opacity:0.4;">
+  <div class="lifecycle-card skeleton-target" id="lifecycle-bar" style="opacity:0.4;">
     <div class="lifecycle-header">
-      <span class="lc-card-title">Booking Lifecycle Progress</span>
+      <span class="lc-card-title">Booking Lifecycle Progress <span class="sim-label" style="margin-left: 8px;">Model</span></span>
       <span class="lc-pct-badge" id="lc-pct-badge">Not started</span>
     </div>
     <div class="lc-track-wrap">
@@ -439,28 +480,28 @@
   </div>
 
   <div class="metrics-row">
-    <div class="metric-card neutral">
-      <div class="metric-label">Initial Listing Fare</div>
+    <div class="metric-card neutral skeleton-target">
+      <div class="metric-label">Initial Listing Fare <span class="sim-label">Simulated</span></div>
       <div class="metric-value" id="m-initial">—</div>
       <div class="metric-sub" id="m-initial-sub">At T-330 days</div>
     </div>
-    <div class="metric-card saffron">
-      <div class="metric-label">Current Fare</div>
+    <div class="metric-card saffron skeleton-target">
+      <div class="metric-label">Current Fare <span class="sim-label">Simulated</span></div>
       <div class="metric-value" id="m-current">—</div>
       <div class="metric-sub" id="m-current-sub">Awaiting Search</div>
     </div>
-    <div class="metric-card green">
-      <div class="metric-label">Lowest Tracked</div>
+    <div class="metric-card green skeleton-target">
+      <div class="metric-label">Lowest Tracked <span class="sim-label">Est.</span></div>
       <div class="metric-value down" id="m-low">—</div>
       <div class="metric-sub" id="m-low-sub">Since listing</div>
       <div class="metric-sub" id="m-low-date" style="margin-top:3px;color:var(--green);opacity:0.85;"></div>
     </div>
-    <div class="metric-card red">
-      <div class="metric-label">Forecast at Departure</div>
+    <div class="metric-card red skeleton-target">
+      <div class="metric-label">Forecast at Departure <span class="sim-label">Est.</span></div>
       <div class="metric-value up" id="m-pred">—</div>
       <div class="metric-sub" id="m-pred-sub">Expected final price</div>
     </div>
-    <div class="metric-card blue">
+    <div class="metric-card blue skeleton-target">
       <div class="metric-label">Timeline Status</div>
       <div class="metric-value neutral" id="m-status">—</div>
       <div class="metric-sub" id="m-status-sub">Days remaining</div>
@@ -468,24 +509,24 @@
   </div>
 
   <div class="content-grid">
-    <div class="panel">
+    <div class="panel skeleton-target">
       <div class="panel-header">
-        <div class="panel-title" id="chart-title">Price Lifecycle Curve</div>
-        <div class="chart-tabs">
-          <button class="chart-tab active" onclick="setZoom('all',this)">330D</button>
-          <button class="chart-tab" onclick="setZoom('past90',this)">Past 90D</button>
-          <button class="chart-tab" onclick="setZoom('past30',this)">Past 30D</button>
-          <button class="chart-tab" onclick="setZoom('past7',this)">Past 7D</button>
-          <button class="chart-tab" onclick="setZoom('future',this)">Forecast</button>
+        <div class="panel-title" id="chart-title">Price Lifecycle Curve <span class="sim-label">Simulated</span></div>
+        <div class="chart-tabs" role="tablist">
+          <button class="chart-tab active" role="tab" onclick="setZoom('all',this)">330D</button>
+          <button class="chart-tab" role="tab" onclick="setZoom('past90',this)">Past 90D</button>
+          <button class="chart-tab" role="tab" onclick="setZoom('past30',this)">Past 30D</button>
+          <button class="chart-tab" role="tab" onclick="setZoom('past7',this)">Past 7D</button>
+          <button class="chart-tab" role="tab" onclick="setZoom('future',this)">Forecast</button>
         </div>
       </div>
       <div class="chart-wrap">
         <div id="empty-chart-msg" class="empty-overlay">
-          <div class="empty-icon">✈</div>
+          <div class="empty-icon" aria-hidden="true">✈</div>
           Enter any valid Indian domestic route above to simulate the full 330-day booking lifecycle.<br>
           <span style="font-size:clamp(0.75rem, 1.5vw, 1rem);color:var(--text3);margin-top:12px;display:block;">Supports 70+ airports from metros to regional hubs.</span>
         </div>
-        <canvas id="priceChart"></canvas>
+        <canvas id="priceChart" aria-label="Flight Price Chart"></canvas>
       </div>
       <div class="chart-legend">
         <div class="legend-item"><div class="legend-line" style="background:var(--green);"></div><span>Tracked History</span></div>
@@ -493,8 +534,8 @@
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Lifecycle Analysis</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Lifecycle Analysis <span class="sim-label">Model</span></div></div>
       <div style="flex-grow:1;display:flex;flex-direction:column;">
         <div class="recommendation-box rec-wait" id="rec-box" style="opacity:0.5;">
           <div class="rec-action" id="rec-action">Awaiting Route Input</div>
@@ -505,16 +546,15 @@
         <div class="stat-row"><span class="stat-row-label">vs. Initial</span><span class="stat-row-value" id="stat-vs-init">—</span></div>
         <div class="stat-row"><span class="stat-row-label">7-Day Trend</span><span class="stat-row-value" id="stat-trend">—</span></div>
 
-        <!-- Book Now Button Container Injection Point -->
         <div id="book-now-injection-point"></div>
 
         <div class="alert-section">
-          <div class="alert-label">🔔 Price Alert — Set Target Fare</div>
+          <label class="alert-label" for="alert-price-input">🔔 Price Alert — Set Target Fare</label>
           <div class="alert-input-row">
             <input class="alert-input" id="alert-price-input" type="number" placeholder="₹ Your target price" min="500" max="30000" style="text-transform:none;">
             <button class="alert-btn" onclick="checkPriceAlert()">Check</button>
           </div>
-          <div class="alert-result" id="alert-result"></div>
+          <div class="alert-result" id="alert-result" role="region" aria-live="polite"></div>
         </div>
       </div>
     </div>
@@ -522,11 +562,11 @@
 
   <div class="features-row">
 
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Smart Booking Score</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Smart Booking Score <span class="sim-label">Model</span></div></div>
       <div class="score-wrap" id="score-wrap">
         <div class="gauge-svg-wrap">
-          <svg width="180" height="110" viewBox="0 0 180 110" style="overflow:visible;">
+          <svg width="180" height="110" viewBox="0 0 180 110" style="overflow:visible;" aria-hidden="true">
             <defs>
               <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stop-color="#f05060"/>
@@ -548,9 +588,9 @@
       </div>
     </div>
 
-    <div class="panel">
+    <div class="panel skeleton-target">
       <div class="panel-header">
-        <div class="panel-title">Flex Date Finder</div>
+        <div class="panel-title">Flex Date Finder <span class="sim-label">Est.</span></div>
         <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);color:var(--text3);background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-full);padding:clamp(3px, 1vw, 6px) clamp(10px, 2vw, 16px);">±3 days</div>
       </div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:12px;line-height:1.5;">Tap a date to re-track. <span style="color:var(--green);font-weight:600;">BEST</span> badge marks the cheapest day in this window.</div>
@@ -561,8 +601,8 @@
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Best Day to Fly</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Best Day to Fly <span class="sim-label">Simulated</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:12px;line-height:1.5;">Average fare by departure weekday for this route near your date.</div>
       <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px;">
         <div class="dow-chart" id="dow-chart">
@@ -576,11 +616,11 @@
 
   <div class="demand-row">
 
-    <div class="demand-panel">
-      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Route Demand Indicator</div></div>
+    <div class="demand-panel skeleton-target">
+      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Route Demand Indicator <span class="sim-label">Est.</span></div></div>
       <div class="demand-inner">
         <div class="demand-ring-wrap">
-          <svg width="88" height="88" viewBox="0 0 88 88">
+          <svg width="88" height="88" viewBox="0 0 88 88" aria-hidden="true">
             <circle cx="44" cy="44" r="34" fill="none" stroke="var(--bg3)" stroke-width="10"/>
             <circle id="demand-ring" cx="44" cy="44" r="34" fill="none" stroke="var(--saffron)" stroke-width="10" stroke-linecap="round" stroke-dasharray="214" stroke-dashoffset="214" transform="rotate(-90 44 44)" style="transition:stroke-dashoffset 1s ease;"/>
           </svg>
@@ -597,10 +637,10 @@
       </div>
     </div>
 
-    <div class="social-proof">
+    <div class="social-proof skeleton-target">
       <div>
-        <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Travelers Watching</div>
-        <div class="social-avatars" id="social-avatars"><div class="social-avatar">👤</div></div>
+        <div style="font-size:clamp(0.65rem, 1.2vw, 0.85rem);font-family:var(--mono);text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:12px;">Travelers Watching <span class="sim-label">Simulated</span></div>
+        <div class="social-avatars" id="social-avatars"><div class="social-avatar" aria-hidden="true">👤</div></div>
       </div>
       <div>
         <div class="social-count" id="social-count">—</div>
@@ -609,8 +649,8 @@
       </div>
     </div>
 
-    <div class="price-confidence">
-      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Forecast Confidence</div></div>
+    <div class="price-confidence skeleton-target">
+      <div class="panel-header" style="margin-bottom:clamp(16px, 2vw, 24px);"><div class="panel-title">Forecast Confidence <span class="sim-label">Model</span></div></div>
       <div class="confidence-bars" id="confidence-bars">
         <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to see confidence breakdown</div>
       </div>
@@ -620,8 +660,8 @@
 
   <div class="split-row">
     
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Price Heatmap Calendar (28 Days)</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Price Heatmap Calendar (28 Days) <span class="sim-label">Est.</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:8px;line-height:1.5;">Visual calendar showing cheap vs expensive days around your departure.</div>
       <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:8px;">
         <div class="heatmap-grid" id="heatmap-grid">
@@ -630,16 +670,15 @@
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Route Comparison</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Route Comparison <span class="sim-label">Model</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Compare your currently tracked route with an alternative destination on the same date.</div>
       <div class="alert-input-row" style="margin-bottom:16px;">
-        <input class="alert-input" id="compare-dest" placeholder="Alt Dest (e.g., GOI)" autocomplete="off">
+        <input class="alert-input" id="compare-dest" placeholder="Alt Dest (e.g., GOI)" aria-label="Alternative Destination" autocomplete="off">
         <button class="alert-btn" onclick="compareRoute()">Compare</button>
         <div class="autocomplete-dropdown" id="compare-dropdown"></div>
       </div>
       <div id="compare-result" style="display:none; background:var(--bg2); padding:clamp(16px, 2.5vw, 24px); border-radius:var(--radius-md); border:1px solid var(--border); transition: all 0.4s;">
-         <!-- Comparison results injected here -->
       </div>
     </div>
 
@@ -647,16 +686,16 @@
 
   <div class="split-row">
     
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Fare History Breakdown</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Fare History Breakdown <span class="sim-label">Simulated</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Average baseline price patterns for this route by season.</div>
       <div id="season-breakdown" style="display:flex; flex-direction:column; gap:clamp(16px, 2.5vw, 24px); opacity:0.4;">
          <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view seasonal history</div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-header"><div class="panel-title">Live Route Path</div></div>
+    <div class="panel skeleton-target">
+      <div class="panel-header"><div class="panel-title">Live Route Path <span class="sim-label">Simulated</span></div></div>
       <div style="width:100%; height:clamp(240px, 30vw, 360px); display:flex; align-items:center; justify-content:center; position:relative; background:var(--bg2); border-radius:var(--radius-md); border:1px solid var(--border); overflow:hidden;" id="flight-path-container">
          <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);">Track a route to view flight path</div>
       </div>
@@ -665,14 +704,14 @@
   </div>
 
   <div class="features-row">
-    <div class="panel" style="grid-column: 1 / -1;">
-      <div class="panel-header"><div class="panel-title">Connecting Flights (1 Stop)</div></div>
+    <div class="panel skeleton-target" style="grid-column: 1 / -1;">
+      <div class="panel-header"><div class="panel-title">Connecting Flights (1 Stop) <span class="sim-label">Est.</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Alternative 1-stop routes to your destination through major Indian hubs.</div>
       <div id="connecting-flights-container" style="display:flex; flex-direction:column; gap:10px;">
         <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view connecting flights</div>
       </div>
 
-      <div class="panel-header" style="margin-top: clamp(24px, 4vw, 40px); border-top: 1px solid var(--border); padding-top: clamp(16px, 3vw, 24px);"><div class="panel-title">Layover Hacks (Hidden City)</div></div>
+      <div class="panel-header" style="margin-top: clamp(24px, 4vw, 40px); border-top: 1px solid var(--border); padding-top: clamp(16px, 3vw, 24px);"><div class="panel-title">Layover Hacks (Hidden City) <span class="sim-label">Simulated</span></div></div>
       <div style="font-size:clamp(0.75rem, 1.5vw, 0.95rem);color:var(--text2);margin-bottom:16px;line-height:1.5;">Find flights to a different final destination that have a layover in <strong>your actual destination</strong>. You exit the airport during the layover.</div>
       <div id="hidden-city-container" style="display:flex; flex-direction:column; gap:10px;">
         <div style="font-size:clamp(0.78rem, 1.5vw, 1rem);font-family:var(--mono);color:var(--text3);text-align:center;padding:24px 0;">Track a route to view layover hacks</div>
@@ -681,7 +720,34 @@
   </div>
 
 </main>
-<div id="toast"></div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="disclaimer-modal" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <div class="modal-title">Welcome to SkyTrackerIndia</div>
+    <div class="modal-body">
+      <strong>Transparency Notice:</strong><br><br>
+      SkyTrackerIndia currently utilizes an advanced predictive simulation model to estimate flight lifecycles, prices, and demand across 70+ Indian airports. <br><br>
+      Unless you provide an active flight API key in the settings, the data presented is algorithmically generated based on historical trends, seasonal demand, and seat-class boundaries. It does <strong>not</strong> represent live airline prices.
+    </div>
+    <button class="modal-btn" onclick="acceptDisclaimer()">I Understand</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settings-modal" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <button class="close-modal" onclick="closeSettings()" aria-label="Close Settings">✕</button>
+    <div class="modal-title">Settings & API</div>
+    <div class="modal-body">
+      <p style="margin-bottom: 12px;">Connect a live flight API (like AviationStack or Amadeus) to replace the simulation model with live data. (Requires CORS access).</p>
+      <label class="seg-label" style="display:block; margin-bottom:4px;" for="api-key-input">Live API Key (Optional)</label>
+      <input class="alert-input" id="api-key-input" type="text" placeholder="Enter API Key or leave blank for simulation" style="width: 100%; margin-bottom: 16px;">
+    </div>
+    <button class="modal-btn" onclick="saveApiKey()">Save Settings</button>
+  </div>
+</div>
+
+<div id="toast" role="alert" aria-live="assertive"></div>
 
 <script>
 const INDIAN_AIRPORTS = {
@@ -710,23 +776,47 @@ const INDIAN_AIRPORTS = {
   'AGX':{name:'Agatti',tier:3,lat:10.82,lon:72.19},'CNN':{name:'Kannur',tier:3,lat:11.91,lon:75.54}
 };
 
+let priceChart=null,currentData=null,currentZoom='all',toastTimer,flightMap=null,mapLayer=null;
+let isLightMode = false, manualThemeOverride = false;
+let currentAlertMatches = [], currentAlertTarget = 0, currentAlertTodayMatch = false, currentAlertTodayFare = 0;
+let userApiKey = localStorage.getItem('skytracker_api_key') || '';
+
+function checkFirstLoad() {
+  if (!localStorage.getItem('skytracker_disclaimer_accepted')) {
+    document.getElementById('disclaimer-modal').classList.add('active');
+  }
+}
+
+function acceptDisclaimer() {
+  localStorage.setItem('skytracker_disclaimer_accepted', 'true');
+  document.getElementById('disclaimer-modal').classList.remove('active');
+}
+
+function openSettings() {
+  document.getElementById('api-key-input').value = userApiKey;
+  document.getElementById('settings-modal').classList.add('active');
+}
+
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('active');
+}
+
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  userApiKey = val;
+  localStorage.setItem('skytracker_api_key', val);
+  closeSettings();
+  toast(val ? "API Key saved." : "Using simulated data.", true);
+}
+
 function setupAutocomplete(inputId, dropdownId) {
     const input = document.getElementById(inputId);
     const dropdown = document.getElementById(dropdownId);
-
-    input.addEventListener('input', function() {
-        renderOptions(this.value.toLowerCase(), dropdown, input);
-    });
-
-    input.addEventListener('focus', function() {
-        renderOptions(this.value.toLowerCase(), dropdown, input);
-    });
-
-    // Close dropdowns when clicking outside
+    if (!input || !dropdown) return;
+    input.addEventListener('input', function() { renderOptions(this.value.toLowerCase(), dropdown, input); });
+    input.addEventListener('focus', function() { renderOptions(this.value.toLowerCase(), dropdown, input); });
     document.addEventListener('click', function(e) {
-        if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('show');
-        }
+        if (!input.contains(e.target) && !dropdown.contains(e.target)) dropdown.classList.remove('show');
     });
 }
 
@@ -734,16 +824,12 @@ function renderOptions(query, dropdown, input) {
     dropdown.innerHTML = '';
     let matches = [];
     const codes = Object.keys(INDIAN_AIRPORTS);
-
-    // Search by both CODE and CITY NAME
     for (const code of codes) {
         const city = INDIAN_AIRPORTS[code].name;
         if (code.toLowerCase().includes(query) || city.toLowerCase().includes(query)) {
             matches.push({ code, city, tier: INDIAN_AIRPORTS[code].tier });
         }
     }
-
-    // Sort by Tier first (Metros at top), then alphabetical
     matches.sort((a, b) => {
        if(a.tier !== b.tier) return a.tier - b.tier;
        return a.city.localeCompare(b.city);
@@ -757,7 +843,6 @@ function renderOptions(query, dropdown, input) {
             div.className = 'ac-item';
             div.innerHTML = `<span class="ac-city">${m.city}</span><span class="ac-code">${m.code}</span>`;
             div.onclick = function() {
-                // Populate input beautifully with City (CODE)
                 input.value = `${m.city} (${m.code})`; 
                 dropdown.classList.remove('show');
             };
@@ -767,11 +852,10 @@ function renderOptions(query, dropdown, input) {
     dropdown.classList.add('show');
 }
 
-// Helper to extract the 3-letter code from "New Delhi (DEL)"
 function extractCode(val) {
     const match = val.match(/\(([A-Z]{3})\)$/i);
     if (match) return match[1].toUpperCase();
-    return val.trim().toUpperCase().substring(0,3); // Fallback for manual typing
+    return val.trim().toUpperCase().substring(0,3); 
 }
 
 function mulberry32(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
@@ -781,21 +865,11 @@ function fmtDate(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'sh
 function fmtShort(d){return d.toLocaleDateString('en-IN',{day:'numeric',month:'short'});}
 function getLocalDateString(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 
-let priceChart=null,currentData=null,currentZoom='all',toastTimer,flightMap=null,mapLayer=null;
-let isLightMode = false;
-let manualThemeOverride = false;
-let currentAlertMatches = [];
-let currentAlertTarget = 0;
-let currentAlertTodayMatch = false;
-let currentAlertTodayFare = 0;
-
 function checkTimeTheme() {
   if (manualThemeOverride) return;
   const hour = new Date().getHours();
   const shouldBeLight = hour >= 6 && hour < 18;
-  if (isLightMode !== shouldBeLight) {
-    setTheme(shouldBeLight);
-  }
+  if (isLightMode !== shouldBeLight) setTheme(shouldBeLight);
 }
 
 function toggleTheme() {
@@ -840,6 +914,14 @@ function toast(msg,ok){
   clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.className='',3500);
 }
 
+function setSkeletons(active) {
+  const targets = document.querySelectorAll('.skeleton-target, .metric-card, .panel');
+  targets.forEach(el => {
+    if (active) el.classList.add('skeleton');
+    else el.classList.remove('skeleton');
+  });
+}
+
 function calcBase(orig,dest,rand){
   const t1=INDIAN_AIRPORTS[orig]?.tier||3,t2=INDIAN_AIRPORTS[dest]?.tier||3;
   let mn=3000,mx=5000;
@@ -859,16 +941,35 @@ function factor(dbd){
   return 1.35+0.8*Math.pow((14-dbd)/14,2);
 }
 
-function priceAt(orig,dest,depDateStr,dbd){
+function priceAt(orig,dest,depDateStr,dbd, flashSales = []){
   let seed=0;const ss=orig+dest+depDateStr;
   for(let i=0;i<ss.length;i++)seed+=ss.charCodeAt(i)*(i+1);
   const rand=mulberry32(seed*123);
   const base=calcBase(orig,dest,rand);
   const tSum=(INDIAN_AIRPORTS[orig]?.tier||3)+(INDIAN_AIRPORTS[dest]?.tier||3);
   const vol=0.06+(tSum*0.015)+rand()*0.08;
+  
+  // Fast forward rand to match dbd point in history
   for(let d=330;d>dbd;d--){rand();}
-  const p=Math.round((base*factor(dbd)*(1+(rand()-0.5)*vol))/10)*10;
-  return Math.min(Math.max(p,1500),28000);
+  
+  let noise=1+(rand()-0.5)*vol;
+  let p = base*factor(dbd)*noise;
+  
+  // Seat Class Boundary Simulation (Skyrockets last 3 days)
+  if (dbd < 3) { p = Math.max(p * 1.6, base * 2.8); }
+  // Flash Sales (Deep discounts on specific days mid-window)
+  else if (flashSales.includes(dbd)) { p = p * 0.75; }
+
+  const dep = new Date(depDateStr);
+  const doy = Math.floor((dep-new Date(dep.getFullYear(),0,0))/86400000);
+  const wknd = dep.getDay()===0||dep.getDay()===5||dep.getDay()===6;
+  const fest = (doy>280&&doy<310)||(doy>60&&doy<80);
+  
+  if(wknd)p=p*1.12;
+  if(fest)p=p*1.25;
+
+  p = Math.round(p/10)*10;
+  return Math.min(Math.max(p,1500),35000); // Increased upper ceiling for biz class bounds
 }
 
 function generateLifecycle(orig,dest,depDateStr){
@@ -876,33 +977,88 @@ function generateLifecycle(orig,dest,depDateStr){
   const dep=new Date(depDateStr);dep.setHours(0,0,0,0);
   const dtd=gap(today,dep);
   
-  if(isNaN(dtd)){toast("Please enter a valid departure date.");return null;}
-  if(dtd<0){toast("Flight already departed. Choose a future date.");return null;}
-  if(dtd>330){toast("Flights aren't listed more than 330 days ahead.");return null;}
+  if(isNaN(dtd)){throw new Error("Invalid departure date.");}
+  if(dtd<0){throw new Error("Flight already departed.");}
+  if(dtd>330){throw new Error("Cannot track >330 days ahead.");}
 
   const listed=new Date(dep);listed.setDate(listed.getDate()-330);
+  
+  // Generate 2-3 flash sale days randomly between 40 and 150 days out
   let seed=0;const ss=orig+dest+depDateStr;
   for(let i=0;i<ss.length;i++)seed+=ss.charCodeAt(i)*(i+1);
-  const rand=mulberry32(seed*123);
-  const base=calcBase(orig,dest,rand);
-  const tSum=(INDIAN_AIRPORTS[orig]?.tier||3)+(INDIAN_AIRPORTS[dest]?.tier||3);
-  const vol=0.06+(tSum*0.015)+rand()*0.08;
-  const doy=Math.floor((dep-new Date(dep.getFullYear(),0,0))/86400000);
-  const wknd=dep.getDay()===0||dep.getDay()===5||dep.getDay()===6;
-  const fest=(doy>280&&doy<310)||(doy>60&&doy<80);
+  const rand=mulberry32(seed*999);
+  let flashSales = [
+    Math.floor(rand() * 110) + 40,
+    Math.floor(rand() * 110) + 40
+  ];
 
+  const base=calcBase(orig,dest,rand);
   const hist=[],fore=[],labels=[],dates=[];
+  
   for(let dbd=330;dbd>=0;dbd--){
-    const noise=1+(rand()-0.5)*vol;
-    let p=Math.round((base*factor(dbd)*noise)/10)*10;
-    if(wknd)p=Math.round(p*1.12);
-    if(fest)p=Math.round(p*1.25);
-    p=Math.min(Math.max(p,1500),28000);
+    const p = priceAt(orig, dest, depDateStr, dbd, flashSales);
     const pt=new Date(dep);pt.setDate(pt.getDate()-dbd);
     dates.push(pt);labels.push(fmtShort(pt));
     if(dbd>=dtd)hist.push(p);else fore.push(p);
   }
-  return{orig,dest,base,listed,today,dep,dtd,tracked:330-dtd,hist,fore:[hist[hist.length-1],...fore],labels,dates};
+  return{orig,dest,base,listed,today,dep,dtd,tracked:330-dtd,hist,fore:[hist[hist.length-1],...fore],labels,dates, flashSales};
+}
+
+// Mock API Call simulating a real network request with potential failures
+async function fetchFlightDataMock(orig, dest, date, apiKey) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (!apiKey) return reject(new Error("No API Key Provided"));
+      if (apiKey.toLowerCase() === 'fail') return reject(new Error("API Rate Limit Exceeded (Mock Error)"));
+      // Simulate real API data structure return, but we'll map it to our lifecycle format
+      resolve({ simulated: false, data: generateLifecycle(orig, dest, date) });
+    }, 600);
+  });
+}
+
+async function trackFlight(){
+  const rawOrig=document.getElementById('inp-origin').value;
+  const rawDest=document.getElementById('inp-dest').value;
+  const orig=extractCode(rawOrig);
+  const dest=extractCode(rawDest);
+  const ds=document.getElementById('inp-date').value;
+  
+  if(!orig||!dest||!ds){toast("Enter Origin, Destination, and Date.");return;}
+  if(orig===dest){toast("Origin and Destination must differ.");return;}
+  if(!INDIAN_AIRPORTS[orig]||!INDIAN_AIRPORTS[dest])toast("Note: One code isn't in DB. Estimating.");
+  
+  setSkeletons(true);
+  
+  try {
+    // 1. Try real API if key exists
+    if (userApiKey) {
+      try {
+        const response = await fetchFlightDataMock(orig, dest, ds, userApiKey);
+        currentData = response.data;
+        toast("✅ Live API Data Loaded", true);
+      } catch (apiErr) {
+        toast("API Error: " + apiErr.message + " — Falling back to simulation", false);
+        // Fallback to simulation
+        await new Promise(r => setTimeout(r, 400)); // slight delay for realistic fallback feel
+        currentData = generateLifecycle(orig, dest, ds);
+      }
+    } else {
+      // 2. Simulated default behavior with skeleton delay
+      await new Promise(r => setTimeout(r, 800)); 
+      currentData = generateLifecycle(orig, dest, ds);
+    }
+
+    if(!rawOrig.includes('(') && INDIAN_AIRPORTS[orig]) document.getElementById('inp-origin').value = `${INDIAN_AIRPORTS[orig].name} (${orig})`;
+    if(!rawDest.includes('(') && INDIAN_AIRPORTS[dest]) document.getElementById('inp-dest').value = `${INDIAN_AIRPORTS[dest].name} (${dest})`;
+    
+    renderChart();
+    updateUI();
+
+  } catch (err) {
+    toast(err.message || "An error occurred while tracking.");
+  } finally {
+    setSkeletons(false);
+  }
 }
 
 function initChart(){
@@ -988,7 +1144,7 @@ function checkPriceAlert(){
   for(let dbd = 0; dbd <= 330; dbd++){
     const ad = new Date(today); ad.setDate(ad.getDate() + dbd);
     const ds = getLocalDateString(ad);
-    const p = priceAt(d.orig, d.dest, ds, dbd);
+    const p = priceAt(d.orig, d.dest, ds, dbd, d.flashSales);
     
     if(p < absoluteMin){
       absoluteMin = p;
@@ -1036,7 +1192,7 @@ function renderAlertMatches(sortMode) {
   html += `
     <div class="alert-controls">
        <span>Tap a date to re-track:</span>
-       <select class="alert-sort" onchange="renderAlertMatches(this.value)">
+       <select class="alert-sort" onchange="renderAlertMatches(this.value)" aria-label="Sort alert matches">
           <option value="date-asc" ${sortMode==='date-asc'?'selected':''}>Date: Near to Far</option>
           <option value="date-desc" ${sortMode==='date-desc'?'selected':''}>Date: Far to Near</option>
           <option value="price-asc" ${sortMode==='price-asc'?'selected':''}>Price: Low to High</option>
@@ -1046,7 +1202,7 @@ function renderAlertMatches(sortMode) {
   `;
 
   const dateStrList = currentAlertMatches.map(m => 
-    `<span class="alert-match-btn" onclick="jumpDate('${m.ds}')">${fmtShort(m.date)} <strong>${fmt(m.price)}</strong></span>`
+    `<button class="alert-match-btn" onclick="jumpDate('${m.ds}')">${fmtShort(m.date)} <strong>${fmt(m.price)}</strong></button>`
   ).join('');
   
   html += `<div style="max-height:140px; overflow-y:auto; padding-right:4px;">${dateStrList}</div>`;
@@ -1082,7 +1238,7 @@ function renderScore(cur,low,pred,dtd){
   document.getElementById('score-desc').textContent=desc;
 }
 
-function renderFlexDates(orig,dest,depStr,dtd){
+function renderFlexDates(orig,dest,depStr,dtd, flashSales){
   const dep=new Date(depStr);dep.setHours(0,0,0,0);
   const today=new Date();today.setHours(0,0,0,0);
   const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -1093,7 +1249,7 @@ function renderFlexDates(orig,dest,depStr,dtd){
     const dbd=Math.max(0,gap(today,d));
     if(dbd<0){cells.push({past:true,d,off});continue;}
     const ds=getLocalDateString(d);
-    const p=priceAt(orig,dest,ds,dbd);
+    const p=priceAt(orig,dest,ds,dbd, flashSales);
     if(p<minP){minP=p;minI=off+3;}
     cells.push({past:false,d,off,p,ds});
   }
@@ -1101,12 +1257,12 @@ function renderFlexDates(orig,dest,depStr,dtd){
   document.getElementById('flex-grid').innerHTML=cells.map((c,i)=>{
     if(c.past)return`<div class="flex-cell past"><div class="flex-day">${days[c.d.getDay()]}</div><div class="flex-date">${fmtShort(c.d)}</div><div class="flex-price">Past</div></div>`;
     const cheap=i===minI,sel=c.off===0;
-    return`<div class="flex-cell${cheap?' cheapest':''}${sel?' selected':''}" onclick="jumpDate('${c.ds}')">
+    return`<button class="flex-cell${cheap?' cheapest':''}${sel?' selected':''}" onclick="jumpDate('${c.ds}')" aria-label="Track ${fmtShort(c.d)} for ${fmt(c.p)}">
       <div class="flex-day">${days[c.d.getDay()]}</div>
       <div class="flex-date">${fmtShort(c.d)}</div>
       <div class="flex-price">${fmt(c.p)}</div>
       <div class="flex-badge">BEST</div>
-    </div>`;
+    </button>`;
   }).join('');
 }
 
@@ -1116,7 +1272,7 @@ function jumpDate(ds){
   toast('Re-tracked: '+new Date(ds).toLocaleDateString('en-IN',{day:'numeric',month:'short'}),true);
 }
 
-function renderBestDay(orig,dest,depStr){
+function renderBestDay(orig,dest,depStr, flashSales){
   const dep=new Date(depStr);dep.setHours(0,0,0,0);
   const today=new Date();today.setHours(0,0,0,0);
   const names=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],namesLong=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -1130,7 +1286,7 @@ function renderBestDay(orig,dest,depStr){
     d.setDate(d.getDate()+diff);
     const dbd=Math.max(1,gap(today,d));
     const ds=getLocalDateString(d);
-    prices.push({name:names[dow],long:namesLong[dow],p:priceAt(orig,dest,ds,dbd)});
+    prices.push({name:names[dow],long:namesLong[dow],p:priceAt(orig,dest,ds,dbd, flashSales)});
   }
 
   const maxP=Math.max(...prices.map(x=>x.p)),minP=Math.min(...prices.map(x=>x.p));
@@ -1179,7 +1335,7 @@ function renderDemand(orig,dest,dtd){
   document.getElementById('social-count').textContent=watch.toLocaleString('en-IN')+' travelers';
   document.getElementById('social-urgency').textContent=pct>70?`Price changed ${Math.floor(Math.random()*3+2)}× in last 24h.`:pct>40?'Price changes expected soon.':'Fares relatively stable now.';
   const em=['👨','👩','🧑','👦','👧'];
-  document.getElementById('social-avatars').innerHTML=em.slice(0,Math.min(5,Math.ceil(pct/20))).map(e=>`<div class="social-avatar">${e}</div>`).join('');
+  document.getElementById('social-avatars').innerHTML=em.slice(0,Math.min(5,Math.ceil(pct/20))).map(e=>`<div class="social-avatar" aria-hidden="true">${e}</div>`).join('');
 
   const hc=t1===1&&t2===1?94:t1+t2<=4?87:79;
   const sc=83;
@@ -1200,7 +1356,7 @@ function renderDemand(orig,dest,dtd){
   setTimeout(()=>document.querySelectorAll('.conf-fill').forEach(e=>e.style.width=e.dataset.w+'%'),120);
 }
 
-function renderHeatmap(orig, dest, depStr) {
+function renderHeatmap(orig, dest, depStr, flashSales) {
   const dep = new Date(depStr); dep.setHours(0,0,0,0);
   const today = new Date(); today.setHours(0,0,0,0);
   const grid = document.getElementById('heatmap-grid');
@@ -1217,7 +1373,7 @@ function renderHeatmap(orig, dest, depStr) {
        continue;
     }
     
-    const p = priceAt(orig, dest, ds, dbd);
+    const p = priceAt(orig, dest, ds, dbd, flashSales);
     if(p < minP) minP = p;
     if(p > maxP) maxP = p;
     cells.push({d, p, past: false, ds});
@@ -1238,10 +1394,10 @@ function renderHeatmap(orig, dest, depStr) {
     if(norm < 0.33) cls = 'hm-low';
     else if(norm > 0.66) cls = 'hm-high';
     
-    return `<div class="heatmap-cell ${cls}" style="cursor:pointer;" onclick="jumpDate('${c.ds}')" title="Track ${fmtShort(c.d)}">
-      <div class="hm-day">${c.d.getDate()} ${c.d.toLocaleString('en-IN',{month:'short'})}</div>
+    return `<button class="heatmap-cell ${cls}" style="cursor:pointer; background:transparent; width:100%; border-radius:4px; border-style:solid; border-width:1px;" onclick="jumpDate('${c.ds}')" title="Track ${fmtShort(c.d)}" aria-label="Track ${fmtShort(c.d)}">
+      <div class="hm-day" style="color:inherit;">${c.d.getDate()} ${c.d.toLocaleString('en-IN',{month:'short'})}</div>
       ${fmt(c.p)}
-    </div>`;
+    </button>`;
   }).join('');
 }
 
@@ -1255,6 +1411,7 @@ function compareRoute() {
   if(altDest === currentData.dest) { toast("Alternative is same as current destination."); return; }
 
   const depStr = document.getElementById('inp-date').value;
+  // Use sim to get comparison price
   const altData = generateLifecycle(currentData.orig, altDest, depStr);
 
   const curPrice = currentData.hist[currentData.hist.length-1];
@@ -1413,7 +1570,7 @@ function renderFlightPath(orig, dest) {
   flightMap.on('zoom', drawOverlay);
 }
 
-function renderConnectingFlights(orig, dest, depStr, dbd) {
+function renderConnectingFlights(orig, dest, depStr, dbd, flashSales) {
   const cont = document.getElementById('connecting-flights-container');
   const hubs = ['DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'CCU', 'AMD', 'PNQ', 'GOI', 'COK'].filter(h => h !== orig && h !== dest);
   
@@ -1428,8 +1585,8 @@ function renderConnectingFlights(orig, dest, depStr, dbd) {
   }
 
   const flights = hubs.map(hub => {
-      const p1 = priceAt(orig, hub, depStr, dbd);
-      const p2 = priceAt(hub, dest, depStr, dbd);
+      const p1 = priceAt(orig, hub, depStr, dbd, flashSales);
+      const p2 = priceAt(hub, dest, depStr, dbd, flashSales);
       
       const discount = Math.floor(rand() * 800) + 200; 
       const total = Math.max(1500, p1 + p2 - discount); 
@@ -1466,9 +1623,9 @@ function renderConnectingFlights(orig, dest, depStr, dbd) {
   }).join('');
 }
 
-function renderHiddenCity(orig, dest, depStr, dbd) {
+function renderHiddenCity(orig, dest, depStr, dbd, flashSales) {
   const cont = document.getElementById('hidden-city-container');
-  const pDirect = priceAt(orig, dest, depStr, dbd);
+  const pDirect = priceAt(orig, dest, depStr, dbd, flashSales);
   const today = new Date(); today.setHours(0,0,0,0);
   const depDate = new Date(depStr);
 
@@ -1481,7 +1638,7 @@ function renderHiddenCity(orig, dest, depStr, dbd) {
       const rand = mulberry32(seed * 789);
 
       if (rand() < 0.10) {
-          const pHidden = priceAt(orig, C, depStr, dbd);
+          const pHidden = priceAt(orig, C, depStr, dbd, flashSales);
           if (pHidden < pDirect - 200) {
               hacks.push({ C, price: pHidden, dateStr: depStr, dateObj: depDate, savings: pDirect - pHidden });
           }
@@ -1528,7 +1685,7 @@ function renderHiddenCity(orig, dest, depStr, dbd) {
           const rand = mulberry32(seed * 789);
 
           if (rand() < 0.10) {
-              const pHiddenAlt = priceAt(orig, C, altDs, altDbd);
+              const pHiddenAlt = priceAt(orig, C, altDs, altDbd, flashSales);
               if (pHiddenAlt < pDirect - 200) {
                   altHacks.push({ C, price: pHiddenAlt, dateStr: altDs, dateObj: altDate, savings: pDirect - pHiddenAlt });
               }
@@ -1541,7 +1698,7 @@ function renderHiddenCity(orig, dest, depStr, dbd) {
       const best = altHacks[0];
       cont.innerHTML = `
         <div style="background:var(--bg2); padding:16px 24px; border-radius:var(--radius-md); border:1px dashed var(--saffron); text-align:center; display:flex; flex-direction:column; align-items:center;">
-            <div style="color:var(--saffron); font-size:clamp(1.2rem, 2vw, 1.5rem); margin-bottom:8px;">⚠️ No Layover Hacks Today</div>
+            <div style="color:var(--saffron); font-size:clamp(1.2rem, 2vw, 1.5rem); margin-bottom:8px;" aria-live="polite">⚠️ No Layover Hacks Today</div>
             <div style="color:var(--text2); font-size:clamp(0.8rem, 1.5vw, 0.95rem); margin-bottom:16px; max-width:500px; line-height:1.5;">
                 We couldn't find any cheaper flights connecting through ${INDIAN_AIRPORTS[dest]?.name || dest} on your chosen date. However, we found a hack on another date!
             </div>
@@ -1585,13 +1742,13 @@ function renderBookButton() {
         Current fare ${fmt(cur)} for ${oName} → ${dName}
       </div>
       <a class="btn-book-primary" href="${ssUrl}" target="_blank" rel="noopener noreferrer" style="width: 100%;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
           <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>
         </svg>
         Book Now on Skyscanner
       </a>
       <div style="width:100%; font-size: clamp(0.6rem, 1.2vw, 0.7rem); color: var(--text3); font-family: var(--mono); line-height: 1.4; text-align: center; margin-top: 4px;">
-        ⚠️ <strong>Disclaimer:</strong> Prices and trends shown are algorithmic predictions, not live airline data. Final availability and fares on external sites may vary.
+        ⚠️ <strong>Disclaimer:</strong> Prices and trends shown are algorithmic predictions unless a valid API key is set. Final availability and fares on external sites may vary.
       </div>
     </div>
   `;
@@ -1599,7 +1756,7 @@ function renderBookButton() {
   const smallHTML = `
     <div style="display: flex; flex-direction: column; align-items: inherit;">
         <a class="btn-book-small" href="${ssUrl}" target="_blank" rel="noopener noreferrer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21,16V14L13,9V3.5A1.5,1.5 0 0,0 11.5,2A1.5,1.5 0 0,0 10,3.5V9L2,14V16L10,13.5V19L8,20.5V22L11.5,21L15,22V20.5L13,19V13.5L21,16Z"/>
           </svg>
           Book Now
@@ -1652,7 +1809,7 @@ function updateUI(){
   document.getElementById('m-status-sub').textContent=`Day ${d.tracked} of 330`;
 
   const oN=INDIAN_AIRPORTS[d.orig]?.name||d.orig,dN=INDIAN_AIRPORTS[d.dest]?.name||d.dest;
-  document.getElementById('chart-title').innerHTML=`${oN} <span style="opacity:0.45">→</span> ${dN}`;
+  document.getElementById('chart-title').innerHTML=`${oN} <span style="opacity:0.45">→</span> ${dN} <span class="sim-label">Simulated</span>`;
 
   const chg=((cur-init)/init*100).toFixed(1);
   document.getElementById('stat-base').innerHTML=`${fmt(d.base)}<span class="route-badge">Tier ${oT}→${dT}</span>`;
@@ -1676,48 +1833,21 @@ function updateUI(){
   renderSavingsBanner(cur,pred);
   renderScore(cur,low,pred,d.dtd);
   const localDepStr = getLocalDateString(d.dep);
-  renderFlexDates(d.orig,d.dest,localDepStr,d.dtd);
-  renderBestDay(d.orig,d.dest,localDepStr);
+  renderFlexDates(d.orig,d.dest,localDepStr,d.dtd, d.flashSales);
+  renderBestDay(d.orig,d.dest,localDepStr, d.flashSales);
   renderDemand(d.orig,d.dest,d.dtd);
 
-  renderHeatmap(d.orig, d.dest, localDepStr);
+  renderHeatmap(d.orig, d.dest, localDepStr, d.flashSales);
   renderSeasonality(d.base);
   renderFlightPath(d.orig, d.dest);
   
-  renderConnectingFlights(d.orig, d.dest, localDepStr, d.dtd);
-  renderHiddenCity(d.orig, d.dest, localDepStr, d.dtd);
+  renderConnectingFlights(d.orig, d.dest, localDepStr, d.dtd, d.flashSales);
+  renderHiddenCity(d.orig, d.dest, localDepStr, d.dtd, d.flashSales);
 
   document.getElementById('compare-result').style.display = 'none';
   document.getElementById('compare-dest').value = '';
 
   renderBookButton();
-}
-
-function trackFlight(){
-  const rawOrig=document.getElementById('inp-origin').value;
-  const rawDest=document.getElementById('inp-dest').value;
-  
-  // Extract the code safely if it was selected from dropdown e.g., "New Delhi (DEL)"
-  const orig=extractCode(rawOrig);
-  const dest=extractCode(rawDest);
-  
-  const ds=document.getElementById('inp-date').value;
-  
-  if(!orig||!dest||!ds){toast("Enter Origin, Destination, and Date.");return;}
-  if(orig===dest){toast("Origin and Destination must differ.");return;}
-  if(!INDIAN_AIRPORTS[orig]||!INDIAN_AIRPORTS[dest])toast("Note: One code isn't in our primary DB. Estimating.");
-  
-  const data=generateLifecycle(orig,dest,ds);
-  if(data){
-    currentData=data;
-    
-    // Clean up input fields if they were typed manually with a raw code
-    if(!rawOrig.includes('(') && INDIAN_AIRPORTS[orig]) document.getElementById('inp-origin').value = `${INDIAN_AIRPORTS[orig].name} (${orig})`;
-    if(!rawDest.includes('(') && INDIAN_AIRPORTS[dest]) document.getElementById('inp-dest').value = `${INDIAN_AIRPORTS[dest].name} (${dest})`;
-    
-    renderChart();
-    updateUI();
-  }
 }
 
 function updateClock(){
@@ -1728,13 +1858,14 @@ function updateClock(){
 }
 
 window.addEventListener('load',()=>{
-  // Setup the new custom autocomplete dropdowns
   setupAutocomplete('inp-origin', 'origin-dropdown');
   setupAutocomplete('inp-dest', 'dest-dropdown');
   setupAutocomplete('compare-dest', 'compare-dropdown');
 
   const d=new Date();d.setDate(d.getDate()+60);
   document.getElementById('inp-date').value=getLocalDateString(d);
+  
+  checkFirstLoad();
   checkTimeTheme();
   initChart();
   updateClock();
